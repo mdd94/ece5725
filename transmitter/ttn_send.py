@@ -1,4 +1,4 @@
-# From https://www.thethingsnetwork.org/docs/applications/python/index.html
+# From https://realpython.com/python-sockets/
 
 '''import time
 import ttn
