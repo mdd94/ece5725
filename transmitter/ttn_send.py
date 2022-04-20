@@ -2,7 +2,7 @@
 
 import time
 import ttn
-from gps.client.gps_collect import captureData
+from data_to_send import captureData
 
 app_id = "iot-food-mgmt"
 access_key = "NNSXS.3SKSOMT667KG4JY4IUALXJPJNNRPWEME3I7Q3FI.OWWDZHAP5PLF7NOW7AGIBPBBSMDDN3LE5L2J46PFJCPIDUOLYKMQ"
