@@ -13,7 +13,7 @@ def temp_and_hum_capture():
   
 
 def captureData():
-  ## formatting the data into a JSON
+  ## formatting the data into a JSON -> work with dictionary
   ## Information for Recognized Food (name/type)
   ## Current Freshness of Food
   ## Ambient Temperature of Demo Environment
