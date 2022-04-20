@@ -1,0 +1,38 @@
+# Adapted from https://github.com/melopero/Melopero_SAM-M8Q by Michelle Davies (mdd94)
+
+import melopero_samm8q.SAM_M8Q as SAM_M8Q
+import melopero_ubx as ubx
+import time
+import sys
+import datetime
+
+dev = SAM_M8Q()
+dev.ubx_only()
+dev.wait_for_acknowledge(ubx.CFG_CLASS, ubx.CFG_PRT)
+dev.set_message_frequency(ubx.NAV_CLASS, ubx.NAV_PVT, 1)
+dev.wait_for_acknowledge(ubx.CFG_CLASS ,ubx.CFG_MSG)
+dev.set_measurement_frequency(500, 1)
+dev.wait_for_acknowledge(ubx.CFG_CLASS, ubx.CFG_RATE)
+
+#One Measurement every 5 seconds for 300 times
+#means 5 * 300 seconds = 1500 seconds = 25 minutes
+
+data = {}
+data['locations'] = []
+
+def captureData():
+  try:
+      info = dev.get_pvt() #returns a dictionary containing the PVT data
+      print(info)
+      if info is not None:
+          new_pt = {
+              'time': (datetime.datetime(info['year'], info['month'], info['day'],info['hour'], info['minute'], info['second']) - datetime.datetime(1970,1,1)).total_seconds(), #convert to epoch time directly (works regardless of python version)
+              'longitude': info["longitude"],
+              'latitude': info["latitude"],
+              'num_satellites' : info["num_satellites"]
+          }
+      return new_pt
+          
+  except:
+      print("Unexpected error:", sys.exc_info())
+      return -1
