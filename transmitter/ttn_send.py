@@ -1,6 +1,6 @@
 # From https://www.thethingsnetwork.org/docs/applications/python/index.html
 
-import time
+'''import time
 import ttn
 from data_to_send import captureData
 
@@ -38,4 +38,6 @@ sensor_data = captureData()
 # send data
 client.send(dev_id, sensor_data, port=1, conf=False, sched="replace")
 
-client.close()
+client.close()'''
+
+
