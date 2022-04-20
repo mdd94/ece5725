@@ -4,8 +4,8 @@ import time
 import ttn
 from gps.client.gps_collect import captureData
 
-app_id = input("Please enter your application ID as shown on your Application on the TTN console.")
-access_key = input("Please enter your access key as shown on the TTN console.")
+app_id = "iot-food-mgmt"
+access_key = "NNSXS.3SKSOMT667KG4JY4IUALXJPJNNRPWEME3I7Q3FI.OWWDZHAP5PLF7NOW7AGIBPBBSMDDN3LE5L2J46PFJCPIDUOLYKMQ"
 
 def uplink_callback(msg, client):
 	print("Received uplink from ", msg.dev_id)
