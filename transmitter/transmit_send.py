@@ -1,9 +1,9 @@
 # From https://realpython.com/python-sockets/
 
-'''import time
-import ttn
+import time
 from data_to_send import captureData
 
+'''
 app_id = "iot-food-mgmt"
 access_key = "NNSXS.3SKSOMT667KG4JY4IUALXJPJNNRPWEME3I7Q3FI.OWWDZHAP5PLF7NOW7AGIBPBBSMDDN3LE5L2J46PFJCPIDUOLYKMQ"
 
@@ -40,4 +40,14 @@ client.send(dev_id, sensor_data, port=1, conf=False, sched="replace")
 
 client.close()'''
 
-
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))
+    s.listen()
+    conn, addr = s.accept()
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            data = conn.recv(captureData())
+            if not data:
+                break
+            conn.sendall(data)
