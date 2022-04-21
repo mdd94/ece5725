@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # function to read, format, and return the sensor data that we need
 
+'''
+This file is for function definitions only. Please import into a new python filt in order to implement.
+
+'''
+
 ## Import modules (gpio, libraries for reading data from sensors, etc)
 import time
 import sys
