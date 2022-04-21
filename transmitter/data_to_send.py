@@ -25,6 +25,7 @@ barcodes_pin = 3
 signal_light_pin = [4, 5, 6] # R pin, G pin, B pin
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(calibration_light_pin, GPIO.OUT)
+p = GPIO.PWM(calibration_light_pin, 10) # channel = pin_num, frequency = freq
 GPIO.setup(dht11_pin, GPIO.IN)
 GPIO.setup(barcodes_pin, GPIO.IN)
 GPIO.setup(signal_light_pin[0], GPIO.OUT)
@@ -34,6 +35,11 @@ dht11_device = adafruit_dht.DHT11(dht11_pin, use_pulseio=False)
 
 def calibration_light():
   ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
+  global p
+  p.start(50)
+  print("blinky")
+  p.stop()
+  print("no blinky")
   
 def camera_scanner():
   ## return values/data
@@ -55,6 +61,12 @@ def temp_and_hum_capture():
   except Exception as error:
     dht11_device.exit()
     raise error
+    
+def pygame_setup():
+  ## set up for pygame
+  
+def piTFT_disp():
+  ## pygame
   
 def captureData():
   ## this function will be imported into the code that transmits the data
@@ -71,8 +83,3 @@ def captureData():
     print("Unexpected error:", sys.exc_info())
     return -1
 
-def pygame_setup():
-  ## set up for pygame
-  
-def piTFT_disp():
-  ## pygame
