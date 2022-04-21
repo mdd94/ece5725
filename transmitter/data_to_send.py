@@ -47,7 +47,11 @@ def calibration_light():
 def camera_scanner():
   ## return values/data
   # camera capture
-  
+  camera.start_preview()
+  for i in range(5):
+      sleep(5)
+      camera.capture('/home/pi/ece5725/image%s.jpg' % i)
+  camera.stop_preview()
   # barcode scanner
   
   
