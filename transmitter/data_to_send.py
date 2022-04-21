@@ -36,6 +36,18 @@ GPIO.setup(signal_light_pin[1], GPIO.OUT)
 GPIO.setup(signal_light_pin[2], GPIO.OUT)
 dht11_device = adafruit_dht.DHT11(dht11_pin, use_pulseio=False)
 camera = PiCamera()
+# barcodes
+ser = serial.Serial("/dev/ttyS0", 115200, timeout=0.5)
+
+print('serial test start ...')
+if ser is not None:
+    print('serial ready...')
+else:
+    print('serial not ready')
+    sys.exit()
+
+ser.timerout = 1  # read time out
+ser.writeTimeout = 0.5  # write time out.
 
 def calibration_light():
   ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
@@ -48,6 +60,7 @@ def calibration_light():
 def camera_scanner():
   ## return values/data
   # camera capture
+  global camera
   camera.start_preview()
   for i in range(5):
       x = datetime.datetime.now()
@@ -55,9 +68,12 @@ def camera_scanner():
       camera.capture('/home/pi/ece5725/image{index}s_{date}.jpg'.format(index=i, date=x))
   camera.stop_preview()
   # barcode scanner
+  global ser
+  
   
   
 def temp_and_hum_capture():
+  global dht11_device
   ## return values
   try:
     # Print the values to the serial port
