@@ -8,6 +8,7 @@ This file is for function definitions only. Please import into a new python filt
 
 ## Import modules (gpio, libraries for reading data from sensors, etc)
 import time
+import serial
 import sys
 import datetime
 import time
