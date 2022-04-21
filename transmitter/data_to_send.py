@@ -53,7 +53,7 @@ screen.fill(BLACK)
 header_font = pygame.font.Font(None, 30)
 text_font = pygame.font.Font(None,20) 
 button_text = 'CLOSE'
-button_position = (160,240)
+button_position = (160,200)
 
 print('serial test start ...')
 if ser is not None:
@@ -151,6 +151,31 @@ def piTFT_disp(data):
                         GPIO.cleanup()
                         quit()
         # draw data to screen
-        
+        leftH_surface = text_font.render("Fields",True,WHITE)
+        leftH_rect = leftH_surface.get_rect(center = (50,50))
+        leftN_surface = text_font.render("Temperature (C)",True,WHITE)
+        leftN_rect = leftN_surface.get_rect(center = (50,100))
+        leftM_surface = text_font.render("Temperature (F)",True,WHITE)
+        leftM_rect = leftM_surface.get_rect(center = (50, 150))
+        leftO_surface = text_font.render("Humidity (%)",True,WHITE)
+        leftO_rect = leftO_surface.get_rect(center= (50, 200))
+        temp_flag = (0, 255, 0) if not data["temp_c_flag"] else (255, 0, 0)
+        hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
+        rightH_surface = text_font.render("Data",True,WHITE)
+        rightH_rect = rightH_surface.get_rect(center = (275,50))
+        rightN_surface = text_font.render(str(data["temp_c"]),True,temp_flag) # temp c
+        rightN_rect = rightN_surface.get_rect(center = (275, 100))
+        rightM_surface = text_font.render(str(data["temp_f"]),True,temp_flag) # temp f
+        rightM_rect = rightM_surface.get_rect(center = (275, 150))
+        rightO_surface = text_font.render(str(data["humidity"]),True,hum_flag) # humidity
+        rightO_rect = rightO_surface.get_rect(center = (275, 200))
+        screen.blit(leftH_surface, leftH_rect)
+        screen.blit(rightH_surface, rightH_rect)
+        screen.blit(leftN_surface,leftN_rect)
+        screen.blit(rightN_surface, rightN_rect)
+        screen.blit(leftM_surface, leftM_rect)
+        screen.blit(rightM_surface, rightM_rect)
+        screen.blit(leftO_surface, leftO_rect)
+        screen.blit(rightO_surface, rightO_rect)
         pygame.display.flip()
         
