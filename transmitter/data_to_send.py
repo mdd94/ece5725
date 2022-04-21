@@ -65,7 +65,7 @@ def temp_and_hum_capture():
 def pygame_setup():
   ## set up for pygame
   
-def piTFT_disp():
+def piTFT_disp(data):
   ## pygame
   
 def captureData():
