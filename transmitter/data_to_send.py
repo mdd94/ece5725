@@ -15,11 +15,14 @@ import subprocess
 calibration_light_pin = 1
 dht11_pin = 2
 barcodes_pin = 3
-
+signal_light_pin = [4, 5, 6] # R pin, G pin, B pin
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(calibration_light_pin, GPIO.OUT)
-GPIO.setup(dht11_pin, GPIO.OUT)
-GPIO.setup(barcodes_pin, GPIO.OUT)
+GPIO.setup(dht11_pin, GPIO.IN)
+GPIO.setup(barcodes_pin, GPIO.IN)
+GPIO.setup(signal_light_pin[0], GPIO.OUT)
+GPIO.setup(signal_light_pin[1], GPIO.OUT)
+GPIO.setup(signal_light_pin[2], GPIO.OUT)
 
 
 def calibration_light():
