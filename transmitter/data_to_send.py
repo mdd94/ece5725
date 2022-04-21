@@ -19,6 +19,7 @@ import os
 import subprocess
 import adafruit_dht
 from picamera import PiCamera
+import datetime
 
 ## Set up GPIO pins and devices
 calibration_light_pin = 1
@@ -49,8 +50,9 @@ def camera_scanner():
   # camera capture
   camera.start_preview()
   for i in range(5):
+      x = datetime.datetime.now()
       sleep(5)
-      camera.capture('/home/pi/ece5725/image%s.jpg' % i)
+      camera.capture('/home/pi/ece5725/image{index}s_{date}.jpg'.format(index=i, date=x))
   camera.stop_preview()
   # barcode scanner
   
