@@ -18,8 +18,9 @@ from pygame.locals import *
 import os
 import subprocess
 import adafruit_dht
+from picamera import PiCamera
 
-## Set up GPIO pins
+## Set up GPIO pins and devices
 calibration_light_pin = 1
 dht11_pin = 2
 barcodes_pin = 3
@@ -33,6 +34,7 @@ GPIO.setup(signal_light_pin[0], GPIO.OUT)
 GPIO.setup(signal_light_pin[1], GPIO.OUT)
 GPIO.setup(signal_light_pin[2], GPIO.OUT)
 dht11_device = adafruit_dht.DHT11(dht11_pin, use_pulseio=False)
+camera = PiCamera()
 
 def calibration_light():
   ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
@@ -44,6 +46,10 @@ def calibration_light():
   
 def camera_scanner():
   ## return values/data
+  # camera capture
+  
+  # barcode scanner
+  
   
 def temp_and_hum_capture():
   ## return values
@@ -62,15 +68,9 @@ def temp_and_hum_capture():
   except Exception as error:
     dht11_device.exit()
     raise error
-    
-def pygame_setup():
-  ## set up for pygame
-  
-def piTFT_disp(data):
-  ## pygame
   
 def captureData():
-  ## this function will be imported into the code that transmits the data
+  ## this function will be imported into the code that transmits the data, calls the functions defined above
   try:
     ## formatting the data into a JSON -> work with dictionary
     ## Information for Recognized Food (name/type)
@@ -83,4 +83,10 @@ def captureData():
   except:
     print("Unexpected error:", sys.exc_info())
     return -1
+  
+def pygame_setup():
+  ## set up for pygame
+  
+def piTFT_disp(data):
+  ## pygame
 
