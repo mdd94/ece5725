@@ -65,6 +65,8 @@ else:
 ser.timerout = 1  # read time out
 ser.writeTimeout = 0.5  # write time out.
 
+food_dict = {}
+
 def calibration_light():
     ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
     global p
@@ -112,6 +114,7 @@ def temp_and_hum_capture():
   
 def captureData():
   ## this function will be imported into the code that transmits the data, calls the functions defined above
+    global food_dict # expected average colors of a list of fruits
     results = dict()
     try:
         ## formatting the data into a JSON -> work with dictionary
@@ -119,8 +122,8 @@ def captureData():
         food_imgs = camera_scanner()
         results["info"] =
         ## Current Freshness of Food
-        
-        results["freshness"] =
+        # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606 
+        results["freshness"] = 
         ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
         temp_hum_dt = temp_and_hum_capture()
         results["temp_c"] = temp_hum_dt["temp_c"]
@@ -139,10 +142,10 @@ def captureData():
             results["hum_flag"] = True
         else:
             ## Temperature Threshold Flag - The transmitter is outputting the light signals for the environment if the temperature lies outside of 30% of the standard room temperature range (“Temperature Threshold Flag”)
-            standard_rt = 21 # in celcius
+            standard_rt = 15.5556 # in celcius, healthy average food pantry storage temp for dry, non refrigerated foods
             threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
             results["temp_flag"] = False if threshold_rt <= 30 else True
-            ## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside of 30% of the standard room humidity range (“Humidity Threshold Flag”).
+            ## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside the optimal room humidity range (“Humidity Threshold Flag”).
             results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True 
         ## return data
         return results
