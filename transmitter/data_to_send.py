@@ -52,6 +52,8 @@ screen = pygame.display.set_mode((320,240))
 screen.fill(BLACK)
 header_font = pygame.font.Font(None, 30)
 text_font = pygame.font.Font(None,20) 
+button_text = 'CLOSE'
+button_position = (160,240)
 
 print('serial test start ...')
 if ser is not None:
@@ -121,5 +123,34 @@ def captureData():
     return -1
   
 def piTFT_disp(data):
-  ## pygame
-
+    ## pygame
+    global screen
+    global WHITE
+    global BLACK
+    global screen
+    global button_text
+    global button_position
+    global header_font
+    global text_font
+    #quit button
+    quit_surface = my_font.render(button_text,True,WHITE)
+    quit_rect = quit_surface.get_rect(center = (button_position[0],button_position[1]))
+    time.sleep(0.2)
+    while True:
+        screen.fill(BLACK)
+        screen.blit(quit_surface, quit_rect)
+        # check close screen btn
+        for event in pygame.event.get():
+            if(event.type is MOUSEBUTTONDOWN):
+                pos = pygame.mouse.get_pos()
+                x,y = pos
+                print(pos)
+                if (y >= button_position[1] - 20 and y <= button_position[1] + 20):
+                    if (x >= button_position[0] - 10 and x <= button_position[0] + 10):
+                        # pushed close btn
+                        GPIO.cleanup()
+                        quit()
+        # draw data to screen
+        
+        pygame.display.flip()
+        
