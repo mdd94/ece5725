@@ -66,27 +66,30 @@ ser.timerout = 1  # read time out
 ser.writeTimeout = 0.5  # write time out.
 
 def calibration_light():
-  ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
-  global p
-  p.start(50)
-  print("blinky")
-  p.stop()
-  print("no blinky")
+    ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
+    global p
+    p.start(50)
+    print("blinky")
+    p.stop()
+    print("no blinky")
   
 def camera_scanner():
-  ## return values/data
-  # camera capture
-  global camera
-  camera.start_preview()
-  for i in range(5):
-      x = datetime.datetime.now()
-      sleep(5)
-      camera.capture('/home/pi/ece5725/image{index}s_{date}.jpg'.format(index=i, date=x))
-  camera.stop_preview()
-  # barcode scanner
-  global ser
-  
-  
+    ## return values/data
+    results = dict()
+    # camera capture
+    global camera
+    camera.start_preview()
+    x = datetime.datetime.now()
+    sleep(5)
+    file_name = '/home/pi/ece5725/image_{date}.jpg'.format(date=x)
+    camera.capture(file_name)
+    camera.stop_preview()
+    results["camera"] = file_name
+    # barcode scanner
+    global ser
+    
+    results["barcodes"] = 
+    return results
   
 def temp_and_hum_capture():
   global dht11_device
@@ -109,18 +112,43 @@ def temp_and_hum_capture():
   
 def captureData():
   ## this function will be imported into the code that transmits the data, calls the functions defined above
-  try:
-    ## formatting the data into a JSON -> work with dictionary
-    ## Information for Recognized Food (name/type)
-    ## Current Freshness of Food
-    ## Ambient Temperature of Demo Environment
-    ## Ambient Humidity of Demo Environment
-    ## Temperature Threshold Flag - The transmitter is outputting the light signals for the environment if the temperature lies outside of 30% of the standard room temperature range (“Temperature Threshold Flag”).
-    ## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside of 30% of the standard room humidity range (“Humidity Threshold Flag”).
-    ## return data
-  except:
-    print("Unexpected error:", sys.exc_info())
-    return -1
+    results = dict()
+    try:
+        ## formatting the data into a JSON -> work with dictionary
+        ## Information for Recognized Food (name/type)
+        food_imgs = camera_scanner()
+        results["info"] =
+        ## Current Freshness of Food
+        
+        results["freshness"] =
+        ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
+        temp_hum_dt = temp_and_hum_capture()
+        results["temp_c"] = temp_hum_dt["temp_c"]
+        results["temp_f"] = temp_hum_dt["temp_f"]
+        results["humidity"] = temp_hum_dt["humidity"]
+        if results["temp_c"] == -1 and results["humidity"] == -1:
+            results["temp_flag"] = True
+            results["hum_flag"] = True
+        elif results["temp_c"] != -1 and results["humidity"] == -1:
+            standard_rt = 21 # in celcius
+            threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
+            results["temp_flag"] = False if threshold_rt <= 30 else True
+            results["hum_flag"] = True
+        elif results["temp_c"] == -1 and results["humidity"] != -1:
+            results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True
+            results["hum_flag"] = True
+        else:
+            ## Temperature Threshold Flag - The transmitter is outputting the light signals for the environment if the temperature lies outside of 30% of the standard room temperature range (“Temperature Threshold Flag”)
+            standard_rt = 21 # in celcius
+            threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
+            results["temp_flag"] = False if threshold_rt <= 30 else True
+            ## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside of 30% of the standard room humidity range (“Humidity Threshold Flag”).
+            results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True 
+        ## return data
+        return results
+    except:
+        print("Unexpected error:", sys.exc_info())
+        return {"food info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, } # params should equal -1 to indicate no valid reading
   
 def piTFT_disp(data):
     ## pygame
@@ -159,7 +187,7 @@ def piTFT_disp(data):
         leftM_rect = leftM_surface.get_rect(center = (50, 150))
         leftO_surface = text_font.render("Humidity (%)",True,WHITE)
         leftO_rect = leftO_surface.get_rect(center= (50, 200))
-        temp_flag = (0, 255, 0) if not data["temp_c_flag"] else (255, 0, 0)
+        temp_flag = (0, 255, 0) if not data["temp_flag"] else (255, 0, 0)
         hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
         rightH_surface = text_font.render("Data",True,WHITE)
         rightH_rect = rightH_surface.get_rect(center = (275,50))
