@@ -65,7 +65,38 @@ else:
 ser.timerout = 1  # read time out
 ser.writeTimeout = 0.5  # write time out.
 
-food_dict = {}
+# define color thresholds
+food_dict = {"":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],
+            "":[(), ()],}
 
 def calibration_light():
     ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
