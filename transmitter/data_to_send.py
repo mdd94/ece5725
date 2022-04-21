@@ -2,7 +2,7 @@
 # function to read, format, and return the sensor data that we need
 
 '''
-This file is for function definitions only. Please import into a new python filt in order to implement.
+This file is for function definitions only. Please import into a new python file in order to implement into main logic.
 
 '''
 
