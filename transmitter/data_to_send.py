@@ -35,10 +35,24 @@ def camera_scanner():
   
 def temp_and_hum_capture():
   ## return values
+  try:
+    # Print the values to the serial port
+    temp_c = dht11_device.temperature
+    temp_f = temp_c * (9 / 5) + 32
+    humidity = dht11_device.humidity
+    print("Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(temp_f, temp_c, humidity))
+    results = {"temp_f":temp_f, "temp_c":temp_c, "humidity":humidity}
+    return results
+  except RuntimeError as error:
+    # Errors happen fairly often, DHT's are hard to read, just keep going
+    print(error.args[0])
+    return {"temp_f":-1, "temp_c":-1, "humidity":-1}
+  except Exception as error:
+    dht11_device.exit()
+    raise error
   
-  
-
 def captureData():
+  ## this function will be imported into the code that transmits the data
   try:
     ## formatting the data into a JSON -> work with dictionary
     ## Information for Recognized Food (name/type)
@@ -57,6 +71,3 @@ def pygame_setup():
   
 def piTFT_disp():
   ## pygame
-  
-  
-## main: use data for display
