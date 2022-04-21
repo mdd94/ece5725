@@ -65,38 +65,15 @@ else:
 ser.timerout = 1  # read time out
 ser.writeTimeout = 0.5  # write time out.
 
-# define color thresholds
-food_dict = {"":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],
-            "":[(), ()],}
+# define color thresholds tones
+food_dict = {"Red":[(129, 14, 42), (220, 98, 67)],
+            "Deep Orange":[(203, 75, 14), (263, 135, 74)],
+            "Orange":[(207, 115, 3), (267, 175, 63)],
+            "Ripe Mango":[(225, 165, 6), (255, 225, 66)],
+            "Bright Yellow":[(225, 210, 0), (285, 270, 30)],
+            "Green Apple":[(72, 150, 41), (132, 210, 101)],
+            "Kiwi":[(112, 199, 33), (142, 259, 93)],
+            "Blueberry":[(), ()]}
 
 def calibration_light():
     ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
