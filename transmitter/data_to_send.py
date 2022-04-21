@@ -98,7 +98,7 @@ def temp_and_hum_capture():
     results = {"temp_f":temp_f, "temp_c":temp_c, "humidity":humidity}
     return results
   except RuntimeError as error:
-    # Errors happen fairly often, DHT's are hard to read, just keep going
+    # Error handling in sensor read
     print(error.args[0])
     return {"temp_f":-1, "temp_c":-1, "humidity":-1}
   except Exception as error:
