@@ -11,6 +11,11 @@ from pygame.locals import *
 import os
 import subprocess
 
+## Set up GPIO pins
+calibration_light_pin = 1
+dht11_pin = 2
+
+
 def calibration_light():
   ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
   
@@ -35,6 +40,9 @@ def captureData():
     print("Unexpected error:", sys.exc_info())
     return -1
 
+def pygame_setup():
+  ## set up for pygame
+  
 def piTFT_disp():
   ## pygame
   
