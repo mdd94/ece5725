@@ -20,6 +20,7 @@ import subprocess
 import adafruit_dht
 from picamera import PiCamera
 import datetime
+import os
 
 ## Set up GPIO pins and devices
 calibration_light_pin = 1
@@ -38,6 +39,19 @@ dht11_device = adafruit_dht.DHT11(dht11_pin, use_pulseio=False)
 camera = PiCamera()
 # barcodes
 ser = serial.Serial("/dev/ttyS0", 115200, timeout=0.5)
+# PiTFT
+os.putenv('SDL_VIDEODRIVER','fbcon')
+os.putenv('SDL_FBDEV','/dev/fb1')
+os.putenv('SDL_MOUSEDRV','TSLIB')
+os.putenv('SDL_MOUSEDEV','/dev/input/touchscreen')
+pygame.init()
+pygame.mouse.set_visible(True)
+WHITE=255,255,255
+BLACK=0,0,0
+screen = pygame.display.set_mode((320,240))
+screen.fill(BLACK)
+header_font = pygame.font.Font(None, 30)
+text_font = pygame.font.Font(None,20) 
 
 print('serial test start ...')
 if ser is not None:
@@ -105,9 +119,6 @@ def captureData():
   except:
     print("Unexpected error:", sys.exc_info())
     return -1
-  
-def pygame_setup():
-  ## set up for pygame
   
 def piTFT_disp(data):
   ## pygame
