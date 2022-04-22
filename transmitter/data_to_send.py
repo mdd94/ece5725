@@ -122,16 +122,19 @@ def temp_and_hum_capture():
     dht11_device.exit()
     raise error
                                          
-def food_by_barcode():
+def food_by_barcode(code):
+    result = {"info":"", "freshness":0}
+    #todo
+    return result
                                          
-                                         
-def food_by_cam():
-    
-                                       
+def food_by_cam(img):
+    global food_dict # expected average colors of a list of fruits
+    result = {"info":"", "freshness":0}
+    #todo
+    return result
   
 def captureData():
-  ## this function will be imported into the code that transmits the data, calls the functions defined above
-    global food_dict # expected average colors of a list of fruits
+    ## this function will be imported into the code that transmits the data, calls the functions defined above
     results = dict()
     try:
         ## formatting the data into a JSON -> work with dictionary
@@ -140,8 +143,14 @@ def captureData():
         food_data = camera_scanner()
         food_img = Image.open(food_data["camera"])
         bar_codes = food_data["barcodes"]
-        results["info"] = 0 #todo
-        results["freshness"] = 0 #todo
+        if len(bar_codes) > 0:
+            b = food_by_barcode(bar_codes)
+            results["info"] = b["info"]
+            results["freshness"] = b["freshness"]
+        else:
+            i = food_by_cam(food_img)
+            results["info"] = i["info"]
+            results["freshness"] = i["freshness"]               
         ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
         temp_hum_dt = temp_and_hum_capture()
         results["temp_c"] = temp_hum_dt["temp_c"]
