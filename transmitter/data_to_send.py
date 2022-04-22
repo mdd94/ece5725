@@ -130,6 +130,7 @@ def food_by_barcode(code):
                                          
 def food_by_cam(img):
     # https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
+    # https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
     global food_dict # expected average colors of a list of fruits
     result = {"info":"", "freshness":0}
     #todo
