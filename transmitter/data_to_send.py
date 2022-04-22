@@ -123,11 +123,13 @@ def temp_and_hum_capture():
     raise error
                                          
 def food_by_barcode(code):
+    # https://thecleverprogrammer.com/2020/10/23/barcode-and-qr-code-reader-with-python/
     result = {"info":"", "freshness":0}
     #todo
     return result
                                          
 def food_by_cam(img):
+    # https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
     global food_dict # expected average colors of a list of fruits
     result = {"info":"", "freshness":0}
     #todo
