@@ -21,6 +21,7 @@ import adafruit_dht
 from picamera import PiCamera
 import datetime
 import os
+from PIL import Image
 
 ## Set up GPIO pins and devices
 calibration_light_pin = 1
@@ -67,13 +68,14 @@ ser.writeTimeout = 0.5  # write time out.
 
 # define color thresholds tones
 food_dict = {"Red":[(129, 14, 42), (220, 98, 67)],
-            "Deep Orange":[(203, 75, 14), (263, 135, 74)],
+            "Deep_Orange":[(203, 75, 14), (263, 135, 74)],
             "Orange":[(207, 115, 3), (267, 175, 63)],
-            "Ripe Mango":[(225, 165, 6), (255, 225, 66)],
-            "Bright Yellow":[(225, 210, 0), (285, 270, 30)],
-            "Green Apple":[(72, 150, 41), (132, 210, 101)],
+            "Ripe_Mango":[(225, 165, 6), (255, 225, 66)],
+            "Bright_Yellow":[(225, 210, 0), (285, 270, 30)],
+            "Green_Apple":[(72, 150, 41), (132, 210, 101)],
             "Kiwi":[(112, 199, 33), (142, 259, 93)],
-            "Blueberry":[(), ()]}
+            "Blueberry":[(0, 0, 128), (204, 204, 255)],
+            "Blue_Violet":[(51, 0, 73), (238, 130, 238]}
 
 def calibration_light():
     ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
@@ -97,8 +99,8 @@ def camera_scanner():
     results["camera"] = file_name
     # barcode scanner
     global ser
-    
-    results["barcodes"] = 
+    # to do
+    results["barcodes"] = ""
     return results
   
 def temp_and_hum_capture():
@@ -119,6 +121,13 @@ def temp_and_hum_capture():
   except Exception as error:
     dht11_device.exit()
     raise error
+                                         
+def food_by_barcode():
+                                         
+                                         
+def food_by_cam():
+    
+                                       
   
 def captureData():
   ## this function will be imported into the code that transmits the data, calls the functions defined above
@@ -126,12 +135,13 @@ def captureData():
     results = dict()
     try:
         ## formatting the data into a JSON -> work with dictionary
-        ## Information for Recognized Food (name/type)
-        food_imgs = camera_scanner()
-        results["info"] =
-        ## Current Freshness of Food
-        # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606 
-        results["freshness"] = 
+        ## Information for Recognized Food (name/type), ## Current Freshness of Food
+        # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606      
+        food_data = camera_scanner()
+        food_img = Image.open(food_data["camera"])
+        bar_codes = food_data["barcodes"]
+        results["info"] = 0 #todo
+        results["freshness"] = 0 #todo
         ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
         temp_hum_dt = temp_and_hum_capture()
         results["temp_c"] = temp_hum_dt["temp_c"]
@@ -159,7 +169,7 @@ def captureData():
         return results
     except:
         print("Unexpected error:", sys.exc_info())
-        return {"food info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, } # params should equal -1 to indicate no valid reading
+        return {"food info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, "humidity":-1, "temp_flag":-1, "hum_flag":-1} # params should equal -1 to indicate no valid reading
   
 def piTFT_disp(data):
     ## pygame
