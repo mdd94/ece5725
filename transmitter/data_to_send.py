@@ -137,7 +137,9 @@ def food_by_cam(img):
 	result = {"info":"", "freshness":0}
 	#todo
 	image = cv2.imread(img)
-										 
+	img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)						    
+	# detect fruit color in img - we know that the color(s) which contrast the setting of the box are the object, so detect fruit as an obj, get matching color threshold from food_dict, and then analyze.									 
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	
 	return result
