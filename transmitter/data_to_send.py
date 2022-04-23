@@ -22,6 +22,7 @@ from picamera import PiCamera
 import datetime
 import os
 from PIL import Image
+import colorsys
 import cv2 
 import numpy as np
 
@@ -67,17 +68,6 @@ else:
 
 ser.timerout = 1  # read time out
 ser.writeTimeout = 0.5  # write time out.
-
-# define color thresholds tones
-food_dict = {"Red":[(129, 14, 42), (220, 98, 67)],
-			"Deep_Orange":[(203, 75, 14), (263, 135, 74)],
-			"Orange":[(207, 115, 3), (267, 175, 63)],
-			"Ripe_Mango":[(225, 165, 6), (255, 225, 66)],
-			"Bright_Yellow":[(225, 210, 0), (285, 270, 30)],
-			"Green_Apple":[(72, 150, 41), (132, 210, 101)],
-			"Kiwi":[(112, 199, 33), (142, 259, 93)],
-			"Blueberry":[(0, 0, 128), (204, 204, 255)],
-			"Blue_Violet":[(51, 0, 73), (238, 130, 238]}
 
 def calibration_light():
 	## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
@@ -133,9 +123,23 @@ def food_by_barcode(code):
 def food_by_cam(img):
 	# https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
 	# https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
-	global food_dict # expected average colors of a list of fruits
+	# https://docs.python.org/3/library/colorsys.html		
+	# define color thresholds tones in HSV
+	food_dict = {"Red":[(345, 89.1, 50.6), (12, 69.5, 86.3)],
+			"Deep_Orange":[(19, 93.1, 79.6), (20, 71.0, 100.0)],
+			"Orange":[(33, 98.6, 81.2), (35, 75.3, 100.0)],
+			"Ripe_Mango":[(44, 97.3, 88.2), (50, 74.1, 100.0)],
+			"Bright_Yellow":[(56, 100.0, 88.2), (60, 88.2, 100.0)],
+			"Green_Apple":[(103, 72.7, 58.8), (103, 51.9, 82.4)],
+			"Kiwi":[(91, 83.4, 78.0), (102, 63.5, 100.0)],
+			"Blueberry":[(240, 100.0, 50.2), (240, 20.0, 100.0)],
+			"Blue_Violet":[(282, 100.0, 28.6), (300, 45.4, 93.3]}
 	result = {"info":"", "freshness":0}
 	#todo
+	image = cv2.imread(img)
+										 
+	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	
 	return result
   
 def captureData():
