@@ -22,6 +22,8 @@ from picamera import PiCamera
 import datetime
 import os
 from PIL import Image
+import cv2 
+import numpy as np
 
 ## Set up GPIO pins and devices
 calibration_light_pin = 1
