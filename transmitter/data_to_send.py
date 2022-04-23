@@ -60,185 +60,185 @@ button_position = (160,200)
 
 print('serial test start ...')
 if ser is not None:
-    print('serial ready...')
+	print('serial ready...')
 else:
-    print('serial not ready')
-    sys.exit()
+	print('serial not ready')
+	sys.exit()
 
 ser.timerout = 1  # read time out
 ser.writeTimeout = 0.5  # write time out.
 
 # define color thresholds tones
 food_dict = {"Red":[(129, 14, 42), (220, 98, 67)],
-            "Deep_Orange":[(203, 75, 14), (263, 135, 74)],
-            "Orange":[(207, 115, 3), (267, 175, 63)],
-            "Ripe_Mango":[(225, 165, 6), (255, 225, 66)],
-            "Bright_Yellow":[(225, 210, 0), (285, 270, 30)],
-            "Green_Apple":[(72, 150, 41), (132, 210, 101)],
-            "Kiwi":[(112, 199, 33), (142, 259, 93)],
-            "Blueberry":[(0, 0, 128), (204, 204, 255)],
-            "Blue_Violet":[(51, 0, 73), (238, 130, 238]}
+			"Deep_Orange":[(203, 75, 14), (263, 135, 74)],
+			"Orange":[(207, 115, 3), (267, 175, 63)],
+			"Ripe_Mango":[(225, 165, 6), (255, 225, 66)],
+			"Bright_Yellow":[(225, 210, 0), (285, 270, 30)],
+			"Green_Apple":[(72, 150, 41), (132, 210, 101)],
+			"Kiwi":[(112, 199, 33), (142, 259, 93)],
+			"Blueberry":[(0, 0, 128), (204, 204, 255)],
+			"Blue_Violet":[(51, 0, 73), (238, 130, 238]}
 
 def calibration_light():
-    ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
-    global p
-    p.start(50)
-    print("blinky")
-    p.stop()
-    print("no blinky")
+	## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
+	global p
+	p.start(50)
+	print("blinky")
+	p.stop()
+	print("no blinky")
   
 def camera_scanner():
-    ## return values/data
-    results = dict()
-    # camera capture
-    global camera
-    camera.start_preview()
-    x = datetime.datetime.now()
-    sleep(5)
-    file_name = '/home/pi/ece5725/image_{date}.jpg'.format(date=x)
-    camera.capture(file_name)
-    camera.stop_preview()
-    results["camera"] = file_name
-    # barcode scanner
-    global ser
-    # to do
-    results["barcodes"] = ""
-    return results
+	## return values/data
+	results = dict()
+	# camera capture
+	global camera
+	camera.start_preview()
+	x = datetime.datetime.now()
+	sleep(5)
+	file_name = '/home/pi/ece5725/image_{date}.jpg'.format(date=x)
+	camera.capture(file_name)
+	camera.stop_preview()
+	results["camera"] = file_name
+	# barcode scanner
+	global ser
+	# to do
+	results["barcodes"] = ""
+	return results
   
 def temp_and_hum_capture():
   global dht11_device
   ## return values
   try:
-    # Print the values to the serial port
-    temp_c = dht11_device.temperature
-    temp_f = temp_c * (9 / 5) + 32
-    humidity = dht11_device.humidity
-    print("Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(temp_f, temp_c, humidity))
-    results = {"temp_f":temp_f, "temp_c":temp_c, "humidity":humidity}
-    return results
+	# Print the values to the serial port
+	temp_c = dht11_device.temperature
+	temp_f = temp_c * (9 / 5) + 32
+	humidity = dht11_device.humidity
+	print("Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(temp_f, temp_c, humidity))
+	results = {"temp_f":temp_f, "temp_c":temp_c, "humidity":humidity}
+	return results
   except RuntimeError as error:
-    # Error handling in sensor read
-    print(error.args[0])
-    return {"temp_f":-1, "temp_c":-1, "humidity":-1}
+	# Error handling in sensor read
+	print(error.args[0])
+	return {"temp_f":-1, "temp_c":-1, "humidity":-1}
   except Exception as error:
-    dht11_device.exit()
-    raise error
-                                         
+	dht11_device.exit()
+	raise error
+										 
 def food_by_barcode(code):
-    # https://thecleverprogrammer.com/2020/10/23/barcode-and-qr-code-reader-with-python/
-    result = {"info":"", "freshness":0}
-    #todo
-    return result
-                                         
+	# https://thecleverprogrammer.com/2020/10/23/barcode-and-qr-code-reader-with-python/
+	result = {"info":"", "freshness":0}
+	#todo
+	return result
+										 
 def food_by_cam(img):
-    # https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
-    # https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
-    global food_dict # expected average colors of a list of fruits
-    result = {"info":"", "freshness":0}
-    #todo
-    return result
+	# https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
+	# https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
+	global food_dict # expected average colors of a list of fruits
+	result = {"info":"", "freshness":0}
+	#todo
+	return result
   
 def captureData():
-    ## this function will be imported into the code that transmits the data, calls the functions defined above
-    results = dict()
-    try:
-        ## formatting the data into a JSON -> work with dictionary
-        ## Information for Recognized Food (name/type), ## Current Freshness of Food
-        # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606      
-        food_data = camera_scanner()
-        food_img = Image.open(food_data["camera"])
-        bar_codes = food_data["barcodes"]
-        if len(bar_codes) > 0:
-            b = food_by_barcode(bar_codes)
-            results["info"] = b["info"]
-            results["freshness"] = b["freshness"]
-        else:
-            i = food_by_cam(food_img)
-            results["info"] = i["info"]
-            results["freshness"] = i["freshness"]               
-        ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
-        temp_hum_dt = temp_and_hum_capture()
-        results["temp_c"] = temp_hum_dt["temp_c"]
-        results["temp_f"] = temp_hum_dt["temp_f"]
-        results["humidity"] = temp_hum_dt["humidity"]
-        if results["temp_c"] == -1 and results["humidity"] == -1:
-            results["temp_flag"] = True
-            results["hum_flag"] = True
-        elif results["temp_c"] != -1 and results["humidity"] == -1:
-            standard_rt = 21 # in celcius
-            threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
-            results["temp_flag"] = False if threshold_rt <= 30 else True
-            results["hum_flag"] = True
-        elif results["temp_c"] == -1 and results["humidity"] != -1:
-            results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True
-            results["hum_flag"] = True
-        else:
-            ## Temperature Threshold Flag - The transmitter is outputting the light signals for the environment if the temperature lies outside of 30% of the standard room temperature range (“Temperature Threshold Flag”)
-            standard_rt = 15.5556 # in celcius, healthy average food pantry storage temp for dry, non refrigerated foods
-            threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
-            results["temp_flag"] = False if threshold_rt <= 30 else True
-            ## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside the optimal room humidity range (“Humidity Threshold Flag”).
-            results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True 
-        ## return data
-        return results
-    except:
-        print("Unexpected error:", sys.exc_info())
-        return {"food info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, "humidity":-1, "temp_flag":-1, "hum_flag":-1} # params should equal -1 to indicate no valid reading
+	## this function will be imported into the code that transmits the data, calls the functions defined above
+	results = dict()
+	try:
+		## formatting the data into a JSON -> work with dictionary
+		## Information for Recognized Food (name/type), ## Current Freshness of Food
+		# for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606      
+		food_data = camera_scanner()
+		food_img = Image.open(food_data["camera"])
+		bar_codes = food_data["barcodes"]
+		if len(bar_codes) > 0:
+			b = food_by_barcode(bar_codes)
+			results["info"] = b["info"]
+			results["freshness"] = b["freshness"]
+		else:
+			i = food_by_cam(food_img)
+			results["info"] = i["info"]
+			results["freshness"] = i["freshness"]               
+		## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
+		temp_hum_dt = temp_and_hum_capture()
+		results["temp_c"] = temp_hum_dt["temp_c"]
+		results["temp_f"] = temp_hum_dt["temp_f"]
+		results["humidity"] = temp_hum_dt["humidity"]
+		if results["temp_c"] == -1 and results["humidity"] == -1:
+			results["temp_flag"] = True
+			results["hum_flag"] = True
+		elif results["temp_c"] != -1 and results["humidity"] == -1:
+			standard_rt = 21 # in celcius
+			threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
+			results["temp_flag"] = False if threshold_rt <= 30 else True
+			results["hum_flag"] = True
+		elif results["temp_c"] == -1 and results["humidity"] != -1:
+			results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True
+			results["hum_flag"] = True
+		else:
+			## Temperature Threshold Flag - The transmitter is outputting the light signals for the environment if the temperature lies outside of 30% of the standard room temperature range (“Temperature Threshold Flag”)
+			standard_rt = 15.5556 # in celcius, healthy average food pantry storage temp for dry, non refrigerated foods
+			threshold_rt = abs((results["temp_c"] - standard_rt)/standard_rt) * 100
+			results["temp_flag"] = False if threshold_rt <= 30 else True
+			## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside the optimal room humidity range (“Humidity Threshold Flag”).
+			results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True 
+		## return data
+		return results
+	except:
+		print("Unexpected error:", sys.exc_info())
+		return {"food info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, "humidity":-1, "temp_flag":-1, "hum_flag":-1} # params should equal -1 to indicate no valid reading
   
 def piTFT_disp(data):
-    ## pygame
-    global screen
-    global WHITE
-    global BLACK
-    global screen
-    global button_text
-    global button_position
-    global header_font
-    global text_font
-    #quit button
-    quit_surface = my_font.render(button_text,True,WHITE)
-    quit_rect = quit_surface.get_rect(center = (button_position[0],button_position[1]))
-    time.sleep(0.2)
-    while True:
-        screen.fill(BLACK)
-        screen.blit(quit_surface, quit_rect)
-        # check close screen btn
-        for event in pygame.event.get():
-            if(event.type is MOUSEBUTTONDOWN):
-                pos = pygame.mouse.get_pos()
-                x,y = pos
-                print(pos)
-                if (y >= button_position[1] - 20 and y <= button_position[1] + 20):
-                    if (x >= button_position[0] - 10 and x <= button_position[0] + 10):
-                        # pushed close btn
-                        GPIO.cleanup()
-                        quit()
-        # draw data to screen
-        leftH_surface = text_font.render("Fields",True,WHITE)
-        leftH_rect = leftH_surface.get_rect(center = (50,50))
-        leftN_surface = text_font.render("Temperature (C)",True,WHITE)
-        leftN_rect = leftN_surface.get_rect(center = (50,100))
-        leftM_surface = text_font.render("Temperature (F)",True,WHITE)
-        leftM_rect = leftM_surface.get_rect(center = (50, 150))
-        leftO_surface = text_font.render("Humidity (%)",True,WHITE)
-        leftO_rect = leftO_surface.get_rect(center= (50, 200))
-        temp_flag = (0, 255, 0) if not data["temp_flag"] else (255, 0, 0)
-        hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
-        rightH_surface = text_font.render("Data",True,WHITE)
-        rightH_rect = rightH_surface.get_rect(center = (275,50))
-        rightN_surface = text_font.render(str(data["temp_c"]),True,temp_flag) # temp c
-        rightN_rect = rightN_surface.get_rect(center = (275, 100))
-        rightM_surface = text_font.render(str(data["temp_f"]),True,temp_flag) # temp f
-        rightM_rect = rightM_surface.get_rect(center = (275, 150))
-        rightO_surface = text_font.render(str(data["humidity"]),True,hum_flag) # humidity
-        rightO_rect = rightO_surface.get_rect(center = (275, 200))
-        screen.blit(leftH_surface, leftH_rect)
-        screen.blit(rightH_surface, rightH_rect)
-        screen.blit(leftN_surface,leftN_rect)
-        screen.blit(rightN_surface, rightN_rect)
-        screen.blit(leftM_surface, leftM_rect)
-        screen.blit(rightM_surface, rightM_rect)
-        screen.blit(leftO_surface, leftO_rect)
-        screen.blit(rightO_surface, rightO_rect)
-        pygame.display.flip()
-        
+	## pygame
+	global screen
+	global WHITE
+	global BLACK
+	global screen
+	global button_text
+	global button_position
+	global header_font
+	global text_font
+	#quit button
+	quit_surface = my_font.render(button_text,True,WHITE)
+	quit_rect = quit_surface.get_rect(center = (button_position[0],button_position[1]))
+	time.sleep(0.2)
+	while True:
+		screen.fill(BLACK)
+		screen.blit(quit_surface, quit_rect)
+		# check close screen btn
+		for event in pygame.event.get():
+			if(event.type is MOUSEBUTTONDOWN):
+				pos = pygame.mouse.get_pos()
+				x,y = pos
+				print(pos)
+				if (y >= button_position[1] - 20 and y <= button_position[1] + 20):
+					if (x >= button_position[0] - 10 and x <= button_position[0] + 10):
+						# pushed close btn
+						GPIO.cleanup()
+						quit()
+		# draw data to screen
+		leftH_surface = text_font.render("Fields",True,WHITE)
+		leftH_rect = leftH_surface.get_rect(center = (50,50))
+		leftN_surface = text_font.render("Temperature (C)",True,WHITE)
+		leftN_rect = leftN_surface.get_rect(center = (50,100))
+		leftM_surface = text_font.render("Temperature (F)",True,WHITE)
+		leftM_rect = leftM_surface.get_rect(center = (50, 150))
+		leftO_surface = text_font.render("Humidity (%)",True,WHITE)
+		leftO_rect = leftO_surface.get_rect(center= (50, 200))
+		temp_flag = (0, 255, 0) if not data["temp_flag"] else (255, 0, 0)
+		hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
+		rightH_surface = text_font.render("Data",True,WHITE)
+		rightH_rect = rightH_surface.get_rect(center = (275,50))
+		rightN_surface = text_font.render(str(data["temp_c"]),True,temp_flag) # temp c
+		rightN_rect = rightN_surface.get_rect(center = (275, 100))
+		rightM_surface = text_font.render(str(data["temp_f"]),True,temp_flag) # temp f
+		rightM_rect = rightM_surface.get_rect(center = (275, 150))
+		rightO_surface = text_font.render(str(data["humidity"]),True,hum_flag) # humidity
+		rightO_rect = rightO_surface.get_rect(center = (275, 200))
+		screen.blit(leftH_surface, leftH_rect)
+		screen.blit(rightH_surface, rightH_rect)
+		screen.blit(leftN_surface,leftN_rect)
+		screen.blit(rightN_surface, rightN_rect)
+		screen.blit(leftM_surface, leftM_rect)
+		screen.blit(rightM_surface, rightM_rect)
+		screen.blit(leftO_surface, leftO_rect)
+		screen.blit(rightO_surface, rightO_rect)
+		pygame.display.flip()
+		
