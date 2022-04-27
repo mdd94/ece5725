@@ -26,6 +26,8 @@ import colorsys
 import cv2 
 import numpy as np
 
+objnum = 1
+
 ## Set up GPIO pins and devices
 calibration_light_pin = 1
 dht11_pin = 2
@@ -125,6 +127,7 @@ def food_by_cam(img):
 	# https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
 	# https://docs.python.org/3/library/colorsys.html		
 	# define color thresholds tones in HSV
+	global objnum
 	food_dict = {"Red":[(345, 89.1, 50.6), (12, 69.5, 86.3)],
 			"Deep_Orange":[(19, 93.1, 79.6), (20, 71.0, 100.0)],
 			"Orange":[(33, 98.6, 81.2), (35, 75.3, 100.0)],
@@ -143,9 +146,7 @@ def food_by_cam(img):
 	img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 	fruit_data = cv2.CascadeClassifier('fruit_data.xml')
 	found = stop_data.detectMultiScale(img_gray, minSize=(10, 10))	
-	print("Objects Found:")						    
-	for obj in found:
-		print(obj)					    
+	print("Objects Found:")						    			    
 	amount_found = len(found)
 	print("# Found: " + str(amount_found))						    
 	if amount_found != 0:
@@ -158,15 +159,21 @@ def food_by_cam(img):
 			red_image = PIL.Image.open(img)
 			red_image_rgb = red_image.convert("RGB")
 			rgb_pixel_value = red_image_rgb.getpixel((x,y))
-			food_name = ""
+			food_name = "ObjectCamDect_{i}".format(i=objnum)
 			info_arr = [food_name, rgb_pixel_value]					    
 			result["info"].append(info_arr)
 			cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
-	#result["freshness"].append()
-	#item_color = food_dict["red"]						    
-	#weaker = item_color[0]
-	#stronger = item_color[1]
-	mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color 
+			objnum += 1
+	for obj in result["info"]:
+		## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
+		item_color = obj[1]	
+
+		#weaker = item_color[0]
+		#stronger = item_color[1]
+		mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
+		#calculate % of white content 
+		#result["freshness"].append()
+
 	cv2.imshow('Image',img_rgb)
 	cv2.imshow('Result',mask) 
 	return result
@@ -274,4 +281,3 @@ def piTFT_disp(data):
 		screen.blit(leftO_surface, leftO_rect)
 		screen.blit(rightO_surface, rightO_rect)
 		pygame.display.flip()
-		
