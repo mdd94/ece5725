@@ -154,9 +154,11 @@ def food_by_cam(img):
 		print("found food")
 		print("Location: {x1}, {y1}".format(x1=x, y1=y))
 		print("Dimensions: {w} by {h}".format(w=width, h=height))					    
-		# which food? how fresh?
-		result["info"].append()
-		result["freshness"].append()	
+		# which food? how fresh?					    
+		#result["info"].append()
+		#result["freshness"].append()
+		cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)						    
+	mask = cv2.inRange(hsv, weaker, stronger) #Threshold HSV image to obtain input color 
 	return result
   
 def captureData():
