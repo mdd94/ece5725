@@ -142,14 +142,21 @@ def food_by_cam(img):
 	# detect fruit color in img - we know that the color(s) which contrast the setting of the box are the object, so detect fruit as an obj, get matching color threshold from food_dict, and then analyze.									 
 	img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 	fruit_data = cv2.CascadeClassifier('fruit_data.xml')
-	found = stop_data.detectMultiScale(img_gray, minSize=(10, 10))
+	found = stop_data.detectMultiScale(img_gray, minSize=(10, 10))	
+	print("Objects Found:")						    
+	for obj in found:
+		print(obj)					    
 	amount_found = len(found)
+	print("# Found: " + str(amount_found))						    
 	if amount_found != 0:
 	    for (x, y, width, height) in found:
 		#cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
 		print("found food")
+		print("Location: {x1}, {y1}".format(x1=x, y1=y))
+		print("Dimensions: {w} by {h}".format(w=width, h=height))					    
 		# which food? how fresh?
-							    
+		result["info"].append()
+		result["freshness"].append()	
 	return result
   
 def captureData():
