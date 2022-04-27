@@ -158,9 +158,11 @@ def food_by_cam(img):
 		#result["info"].append()
 		#result["freshness"].append()
 		cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)						    
-	weaker =
-	stronger = 						    
-	mask = cv2.inRange(hsv, weaker, stronger) #Threshold HSV image to obtain input color 
+	weaker = np.array([0,0,100])
+	stronger = np.array([10,255,255])
+	mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color 
+	cv2.imshow('Image',image)
+	cv2.imshow('Result',mask) 
 	return result
   
 def captureData():
