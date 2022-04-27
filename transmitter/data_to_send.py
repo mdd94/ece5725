@@ -133,7 +133,7 @@ def food_by_cam(img):
 			"Green_Apple":[(103, 72.7, 58.8), (103, 51.9, 82.4)],
 			"Kiwi":[(91, 83.4, 78.0), (102, 63.5, 100.0)],
 			"Blueberry":[(240, 100.0, 50.2), (240, 20.0, 100.0)],
-			"Blue_Violet":[(282, 100.0, 28.6), (300, 45.4, 93.3]}
+			"Blue_Violet":[(282, 100.0, 28.6), (300, 45.4, 93.3)]}
 	result = {"info":[], "freshness":[]}
 	#todo
 	image = cv2.imread(img)
@@ -149,19 +149,25 @@ def food_by_cam(img):
 	amount_found = len(found)
 	print("# Found: " + str(amount_found))						    
 	if amount_found != 0:
-	    for (x, y, width, height) in found:
-		#cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
-		print("found food")
-		print("Location: {x1}, {y1}".format(x1=x, y1=y))
-		print("Dimensions: {w} by {h}".format(w=width, h=height))					    
-		# which food? how fresh?					    
-		#result["info"].append()
-		#result["freshness"].append()
-		cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)						    
-	weaker = np.array([0,0,100])
-	stronger = np.array([10,255,255])
+	  for (x, y, width, height) in found:
+			#cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
+			print("found food")
+			print("Location: {x1}, {y1}".format(x1=x, y1=y))
+			print("Dimensions: {w} by {h}".format(w=width, h=height))					    
+			# which food?
+			red_image = PIL.Image.open(img)
+			red_image_rgb = red_image.convert("RGB")
+			rgb_pixel_value = red_image_rgb.getpixel((x,y))
+			food_name = ""
+			info_arr = [food_name, rgb_pixel_value]					    
+			result["info"].append(info_arr)
+			cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
+	#result["freshness"].append()
+	#item_color = food_dict["red"]						    
+	#weaker = item_color[0]
+	#stronger = item_color[1]
 	mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color 
-	cv2.imshow('Image',image)
+	cv2.imshow('Image',img_rgb)
 	cv2.imshow('Result',mask) 
 	return result
   
