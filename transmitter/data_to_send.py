@@ -3,7 +3,7 @@
 
 '''
 This file is for function definitions only. Please import into a new python file in order to implement into main logic.
-
+https://www.irjet.net/archives/V7/i5/IRJET-V7I51254.pdf
 '''
 
 ## Import modules (gpio, libraries for reading data from sensors, etc)
