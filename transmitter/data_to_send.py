@@ -26,7 +26,7 @@ import colorsys
 import cv2 
 import numpy as np
 import board
-
+from ws_barcode_scanner import BarcodeScanner
 objnum = 1
 
 ## Set up GPIO pins and devices
@@ -45,7 +45,7 @@ GPIO.setup(signal_light_pin[2], GPIO.OUT)
 dht11_device = adafruit_dht.DHT11(board.D13, use_pulseio=False)
 camera = PiCamera()
 # barcodes
-ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=0.5)
+scanner = BarcodeScanner("/dev/tty5")
 
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
@@ -71,23 +71,15 @@ text_font = pygame.font.Font(None,20)
 button_text = 'CLOSE'
 button_position = (160,200)
 
-print('serial test start ...')
-if ser is not None:
-    print('serial ready...')
-else:
-    print('serial not ready')
-    sys.exit()
-
-#ser.timerout = 1  # read time out
-#ser.writeTimeout = 0.5  # write time out.
-
 def calibration_light():
     ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
+    now = time.time()
     global p
-    p.start(50)
-    print("blinky")
-    p.stop()
-    print("no blinky")
+    while (time.time() < now + 1):
+        p.start(100)
+        print("blinky")
+        p.stop()
+        print("no blinky")
   
 def camera_scanner():
     ## return values/data
@@ -102,12 +94,10 @@ def camera_scanner():
     camera.stop_preview()
     results["camera"] = file_name
     # barcode scanner
-    global ser
-    # to do
-    bytesToRead = ser.inWaiting()
-    bardt = ser.read(bytesToRead)
-    print(bardt)
-    results["barcodes"] = bardt
+    global scanner
+    timestamp = scanner.last_timestamp
+    bcode = scanner.last_code
+    results["barcodes"] = [timestamp, bcode]
     return results
   
 def temp_and_hum_capture():
@@ -133,6 +123,10 @@ def food_by_barcode(code):
     # https://thecleverprogrammer.com/2020/10/23/barcode-and-qr-code-reader-with-python/
     result = {"info":"", "freshness":0}
     #todo
+    data = code # look at upc api
+    result["info"] = data
+    freshness =  # look at upcfood api : exp date vs current day ratio: percentage per day left (100 days > implies 100% fresh)
+    result["freshness"] = freshness
     return result
                                          
 def food_by_cam(img):
@@ -294,6 +288,5 @@ def piTFT_disp(data):
         screen.blit(leftO_surface, leftO_rect)
         screen.blit(rightO_surface, rightO_rect)
         pygame.display.flip()
-
 
 
