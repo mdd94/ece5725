@@ -33,7 +33,7 @@ objnum = 1
 calibration_light_pin = 26
 dht11_pin = 13
 barcodes_pin = 3
-signal_light_pin = [4, 5, 6] # R pin, G pin, B pin
+signal_light_pin = [22, 4, 6] # R pin, G pin, B pin
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(calibration_light_pin, GPIO.OUT)
 p = GPIO.PWM(calibration_light_pin, 10) # channel = pin_num, frequency = freq
@@ -234,6 +234,7 @@ def captureData():
   
 def piTFT_disp(data):
     ## pygame
+    global signal_light_pin
     global screen
     global WHITE
     global BLACK
@@ -271,6 +272,24 @@ def piTFT_disp(data):
         leftO_rect = leftO_surface.get_rect(center= (50, 200))
         temp_flag = (0, 255, 0) if not data["temp_flag"] else (255, 0, 0)
         hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
+        if (temp_flag):
+        `	# red color
+        	print("Excess Temperature Detected - Red")
+        	GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+        	GPIO.output(signal_light_pin[1], 25) # Green Pin Set
+        	GPIO.output(signal_light_pin[2], 0) # Blue Pin Set
+        elif (hum_flag):
+        	# Purple color
+        	print("Excess Humidity Detected - Purple")
+        	GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+        	GPIO.output(signal_light_pin[1], 0) # Green Pin Set
+        	GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
+        else: # neither
+        	# white color
+        	print("Optimal Temperature and Humidity Detected - White")
+        	GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+        	GPIO.output(signal_light_pin[1], 255) # Green Pin Set
+        	GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
         rightH_surface = text_font.render("Data",True,WHITE)
         rightH_rect = rightH_surface.get_rect(center = (275,50))
         rightN_surface = text_font.render(str(data["temp_c"]),True,temp_flag) # temp c
@@ -288,5 +307,4 @@ def piTFT_disp(data):
         screen.blit(leftO_surface, leftO_rect)
         screen.blit(rightO_surface, rightO_rect)
         pygame.display.flip()
-
 
