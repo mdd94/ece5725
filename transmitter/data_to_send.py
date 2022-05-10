@@ -28,6 +28,7 @@ import numpy as np
 import board
 from ws_barcode_scanner import BarcodeScanner
 objnum = 1
+import requests
 
 ## Set up GPIO pins and devices
 calibration_light_pin = 26
@@ -124,9 +125,13 @@ def food_by_barcode(code):
     result = {"info":"", "freshness":0}
     #todo
     data = code # look at upc api
-    result["info"] = data
-    freshness =  # look at upcfood api : exp date vs current day ratio: percentage per day left (100 days > implies 100% fresh)
-    result["freshness"] = freshness
+    DEMO_KEY = TfDLCvnjZoR2oyWIVIebJysr1TbYqi3PPDggY1Q8 # obtained from api.data.gov via email
+    url = "https://api.nal.usda.gov/fdc/v1/food/{c}?api_key={d}".format(c=data, d=DEMO_KEY)
+    food_code_info = requests.get(url)
+    if (food_code_info.status_code == 200):
+    	result["info"] = food_code_info 
+    	freshness =  # look at upcfood api : exp date vs current day ratio: percentage per day left (100 days > implies 100% fresh)
+    	result["freshness"] = freshness
     return result
                                          
 def food_by_cam(img):
@@ -174,9 +179,8 @@ def food_by_cam(img):
     for obj in result["info"]:
         ## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
         item_color = obj[1]	
-
-        #weaker = item_color[0]
-        #stronger = item_color[1]
+		weaker = item_color[0]
+        stronger = item_color[1]
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
         #result["freshness"].append()
@@ -307,4 +311,5 @@ def piTFT_disp(data):
         screen.blit(leftO_surface, leftO_rect)
         screen.blit(rightO_surface, rightO_rect)
         pygame.display.flip()
-
+        
+        
