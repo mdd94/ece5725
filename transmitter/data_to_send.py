@@ -192,6 +192,7 @@ def food_by_cam(img):
 def captureData():
     ## this function will be imported into the code that transmits the data, calls the functions defined above
     results = dict()
+    results["timestamp_packet"] = datetime.datetime.now()
     try:
         ## formatting the data into a JSON -> work with dictionary
         ## Information for Recognized Food (name/type), ## Current Freshness of Food
@@ -311,5 +312,3 @@ def piTFT_disp(data):
         screen.blit(leftO_surface, leftO_rect)
         screen.blit(rightO_surface, rightO_rect)
         pygame.display.flip()
-        
-        
