@@ -1,0 +1,22 @@
+'''
+TCP Client file to transmit data to receiver.
+'''
+
+import time
+import data_to_send
+import socket
+import json
+
+HOST = "127.0.0.1"  # The server's hostname or IP address
+PORT = 65432  # The port used by the server
+
+packet = data_to_send.captureData() # dictionary
+data_string = json.dumps(packet) #data serialized (dict -> str obj)
+data_dict = str.encode(data_string) # converts serialized data to bytes from str obj
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    s.sendall(data_dict)
+    data = s.recv(1024)
+
+print(f"Received {data!r}")
