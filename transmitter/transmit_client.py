@@ -6,9 +6,15 @@ import time
 import data_to_send
 import socket
 import json
+import sys
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
+HOST = sys.argv[1]  # Standard loopback interface address (localhost)
+PORT = sys.argv[2]  # Port to listen on (non-privileged ports are > 1023)
+
+if HOST is None:
+    HOST = "127.0.0.1"  # The server's hostname or IP address
+if PORT is None:
+    PORT = 65432  # The port used by the server
 
 packet = data_to_send.captureData() # dictionary
 data_string = json.dumps(packet) #data serialized (dict -> str obj)
