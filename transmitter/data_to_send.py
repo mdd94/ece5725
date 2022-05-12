@@ -18,7 +18,6 @@ import os
 import subprocess
 import adafruit_dht
 from picamera import PiCamera
-import os
 from PIL import Image
 import colorsys
 import cv2 
