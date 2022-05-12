@@ -11,7 +11,6 @@ import time
 import serial
 import sys
 import datetime
-import time
 import RPi.GPIO as GPIO
 import pygame
 from pygame.locals import *
