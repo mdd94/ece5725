@@ -232,7 +232,7 @@ def captureData():
         return results
     except:
         print("Unexpected error:", sys.exc_info())
-        return {"food info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, "humidity":-1, "temp_flag":-1, "hum_flag":-1} # params should equal -1 to indicate no valid reading
+        return {"info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, "humidity":-1, "temp_flag":-1, "hum_flag":-1} # params should equal -1 to indicate no valid reading
   
 def piTFT_disp(data):
     ## pygame
