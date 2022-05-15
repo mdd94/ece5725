@@ -23,7 +23,4 @@ data_dict = str.encode(data_string) # converts serialized data to bytes from str
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     s.sendall(data_dict)
-    data = s.recv(1024)
-
-print(f"Received {data!r}")
 
