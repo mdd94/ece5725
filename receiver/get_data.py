@@ -1,1 +1,127 @@
+'''
+
+This file defines the functions that intake, read and process the data packets that have been sent to the receiver program.
+They will be called in the main program.
+
+Sources:
+https://realpython.com/beautiful-soup-web-scraper-python/#static-websites
+https://github.com/psf/requests-html
+
+'''
+
+import requests
+from bs4 import BeautifulSoup
+from requests_html import HTMLSession, AsyncHTMLSession
+import datetime
+import glob
+import os
+import socket
+import sys
+
+## Reading Data Functions
+
+def read_in(HOST, PORT):
+	# receive packet, read, return it as dict structure
+	if HOST is None:
+	    HOST = "127.0.0.1"  # The server's hostname or IP address
+	if PORT is None:
+	    PORT = 65432  # The port used by the server
+	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    	s.connect((HOST, PORT))
+    	 data = s.recv(1024)
+	print(f"Received {data!r}")
+	return data # expecting JSON
+
+## Processing Data Functions
+
+def websc_recipes(food):
+	## use food argument to do a Google search for recipes and return resulting links as well as search query link.
+	recipes = dict()
+	search_URL_g = "https://www.google.com/search?q=recipes+with+{ingredient}".format(ingredient=food)
+	search_URL = "https://www.bbcgoodfood.com/recipes/collection/{ingredient}-recipes".format(ingredient=food)
+	# The original search URLs are always an element of recipes, guarrenteeing that length(search_URL) >= 1
+	recipes["g_search_url"] = search_URL_g
+	recipes["bbc_search_url"] = search_URL
+	session = HTMLSession()
+	page_web = session.get(search_URL)
+	page_web.html.render()
+	results_bbc = page_web.html.search(food.lower())[0]
+	print(results_bbc)
+	recipes["results_bbc_raw"] = results_bbc
+	page_google = session.get(search_URL_g)
+	page_google.html.render()
+	results_g = page_google.html.search(food.lower())[0]
+	print(results_g)
+	recipes["results_google_raw"] = results_g
+	# having the raw data is good, but it would be better to get the target data...for google, the title and link would suffice; for bbc, the description with each link would be great in addition to the same components as the google one
+	# google
+	title_g = [element.text for element in page_google.html.find('.title')]
+	link_g = [element.text for element in page_google.html.find('.link')]
+	recipe_data_google = dict(zip(title_g, link_g))
+	recipes["results_google_processed"] = recipe_data_google
+	# bbc
+	title_b = [element.text for element in page_web.html.find('.title')]
+	link_b = [element.text for element in page_web.html.find('.link')]
+	desc_b = [element.text for element in page_web.html.find('.description')]
+	recipe_data_bbc = dict(zip(title_b, link_b, desc_b))
+	recipes["results_bbc_processed"] = recipe_data_bbc
+	return recipes
+
+
+## Outputting HTML dashboard with data Functions
+
+# display info on inventory, expecting JSON input
+def inventory(read):
+	print(read)
+	return ""
+
+# get data for humidity, expecting JSON input
+def hum_data(read):
+	print(read)
+	return ""
+
+# get data for temp, expecting JSON input
+def temp_data(read):
+	print(read)
+	return ""
+
+# get freshness of food graph trend, expecting JSON input
+def fresh_data(read):
+	print(read)
+	return ""
+
+# format recipe information, expecting JSON input
+def recipe_book(read):
+	print(read)
+	return ""
+
+# construct html dashboard with the info obtained via the previous helper functions
+# expect all info to be put into array to be decompressed in function
+def construct_dashboard(info):
+	dashboard = open("dashboard_{d}.html".format(d=datetime.now()),"w")
+	# format beginning
+	dashboard.write("<!DOCTYPE html> <html> <head> <title>Food Mgmt Dashboard</title> <style> .all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} .all-browsers > h1, .browser {margin: 10px;  padding: 5px;} .browser {background: white;} .browser > h2, p {  margin: 4px;  font-size: 90%;} footer { text-align: center; padding: 3px; background-color: lightgray; color: white;}</style></head> <body>")
+	dashboard.write("<h1>IoT Food Management System Dashboard</h1>")
+	dashboard.write("<p>This dashboard reports trends in temperature and humidity over time as it relates to food item freshness for each item logged in inventory.</p>")
+	for piece in info:
+		print(piece)
+		dashboard.write(piece)
+	# format ending
+	dashboard.write("</body></html>")
+	# traverse whole directory
+	dashboard.write("<footer>")
+	dashboard.write("<h2>Past Dashboard Entries</h2>")
+	for root, dirs, files in os.walk(r'./reciever'):
+	    # select file name
+	    for file in files:
+	        # check the extension of files
+	        if file.endswith('.html'):
+	            # print whole path of files
+	            file_path = os.path.join(root, file)
+	            print(file_path)
+	            dashboard.write("<p><a href='{link}'>{file_name}</a></p>".format(file_name=file, link=file_path))
+	dashboard.write("<p>ECE 5725 - Spring 2022 | IoT Food Management System</p> <p>Group 3, Wednesday Night Lab</p>")
+	dashboard.write("</footer>")
+	dashboard.close() # finished writing file
+
 
