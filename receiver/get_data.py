@@ -28,7 +28,8 @@ def read_in(HOST, PORT):
 	    PORT = 65432  # The port used by the server
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     	s.connect((HOST, PORT))
-    	 data = s.recv(1024)
+    	data = s.recv(1024)
+    	s.close()
 	print(f"Received {data!r}")
 	return data # expecting JSON
 
@@ -40,6 +41,7 @@ def websc_recipes(food):
 	search_URL_g = "https://www.google.com/search?q=recipes+with+{ingredient}".format(ingredient=food)
 	search_URL = "https://www.bbcgoodfood.com/recipes/collection/{ingredient}-recipes".format(ingredient=food)
 	# The original search URLs are always an element of recipes, guarrenteeing that length(search_URL) >= 1
+	recipes["food_ingredient"] = food
 	recipes["g_search_url"] = search_URL_g
 	recipes["bbc_search_url"] = search_URL
 	session = HTMLSession()
@@ -73,44 +75,64 @@ def websc_recipes(food):
 # display info on inventory, expecting JSON input
 def inventory(read):
 	print(read)
-	return ""
+	info = "<h2>Information about the food in the Inventory</h2>\n"
+
+	return info
 
 # get data for humidity, expecting JSON input
 def hum_data(read):
 	print(read)
-	return ""
+	info = "<h2>Information about the humidity of the storage unit</h2>\n"
+
+	return info
 
 # get data for temp, expecting JSON input
 def temp_data(read):
 	print(read)
-	return ""
+	info = "<h2>Information about the temperature of the storage unit</h2>\n"
+
+	return info
 
 # get freshness of food graph trend, expecting JSON input
 def fresh_data(read):
 	print(read)
-	return ""
+	info = "<h2>Information about the freshness of the food contained in the storage unit</h2>\n"
+	
+	return info
 
-# format recipe information, expecting JSON input
+# format recipe information, expecting dict input
 def recipe_book(read):
 	print(read)
-	return ""
+	html_out = "\n<h2>Recipe(s) for Inventory Items</h2>\n<p>For the items identified in the pantry, we have found a few recipes that you can follow in order to use the food while it is still fresh. These recipes were sourced from bbcgoodfood and Google at the time of compliation.</p>\n"
+	for key, value in read.items():
+		if key == "food_ingredient":
+			new_info = "<p>The item in our inventory that we will be analyzing is {v} [arg={k}].</p>\n".format(k=key, v=value)
+		elif key == "g_search_url": 
+			new_info = "<p>To search for recipes for this food ingredient on Google, we can navigate to the following <a href='{v}'>link</a> [arg={k}].</p>\n".format(k=key, v=value)
+		elif key == "bbc_search_url": 
+			new_info = "<p>We can also search for this food ingredient on BBC Good Food to find a recipe, by navigating to the following <a href='{v}'>link</a> [arg={k}].</p>\n".format(k=key, v=value)
+		else: # other data
+			for key1, value1 in value.items():
+				new_info = "<h4>Recipe Data from Webscrapping:</h4>\n<p>{v}</p>\n".format(k=key1, v=value1)
+		html_out += new_info
+	return html_out
 
 # construct html dashboard with the info obtained via the previous helper functions
-# expect all info to be put into array to be decompressed in function
+# expect all info to be put into array to be written into HTML in function
 def construct_dashboard(info):
 	dashboard = open("dashboard_{d}.html".format(d=datetime.now()),"w")
 	# format beginning
-	dashboard.write("<!DOCTYPE html> <html> <head> <title>Food Mgmt Dashboard</title> <style> .all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} .all-browsers > h1, .browser {margin: 10px;  padding: 5px;} .browser {background: white;} .browser > h2, p {  margin: 4px;  font-size: 90%;} footer { text-align: center; padding: 3px; background-color: lightgray; color: white;}</style></head> <body>")
-	dashboard.write("<h1>IoT Food Management System Dashboard</h1>")
-	dashboard.write("<p>This dashboard reports trends in temperature and humidity over time as it relates to food item freshness for each item logged in inventory.</p>")
+	dashboard.write("<!DOCTYPE html> \n<html> \n<head> \n<title>Food Mgmt Dashboard</title> \n<style> \n.all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} \n.all-browsers > h1, \n.browser {margin: 10px;  padding: 5px;} \n.browser {background: white;} \n.browser > h2, p {  margin: 4px;  font-size: 90%;} \nfooter { text-align: center; padding: 3px; background-color: lightgray; color: white;}\n</style>\n</head> <body>\n")
+	dashboard.write("<h1>IoT Food Management System Dashboard</h1>\n")
+	dashboard.write("<p>This dashboard reports trends in temperature and humidity over time as it relates to food item freshness for each item logged in inventory.</p>\n")
 	for piece in info:
 		print(piece)
 		dashboard.write(piece)
 	# format ending
-	dashboard.write("</body></html>")
+	dashboard.write("</body>\n</html>\n")
 	# traverse whole directory
-	dashboard.write("<footer>")
-	dashboard.write("<h2>Past Dashboard Entries</h2>")
+	dashboard.write("<footer>\n")
+	dashboard.write("<h2>Past Dashboard Entries</h2>\n")
 	for root, dirs, files in os.walk(r'./reciever'):
 	    # select file name
 	    for file in files:
@@ -119,9 +141,7 @@ def construct_dashboard(info):
 	            # print whole path of files
 	            file_path = os.path.join(root, file)
 	            print(file_path)
-	            dashboard.write("<p><a href='{link}'>{file_name}</a></p>".format(file_name=file, link=file_path))
-	dashboard.write("<p>ECE 5725 - Spring 2022 | IoT Food Management System</p> <p>Group 3, Wednesday Night Lab</p>")
+	            dashboard.write("<p><a href='{link}'>{file_name}</a></p>\n".format(file_name=file, link=file_path))
+	dashboard.write("<p>ECE 5725 - Spring 2022 | IoT Food Management System</p>\n<p>Group 3, Wednesday Night Lab</p>\n")
 	dashboard.write("</footer>")
 	dashboard.close() # finished writing file
-
-
