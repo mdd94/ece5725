@@ -76,28 +76,28 @@ def websc_recipes(food):
 def inventory(read):
 	print(read)
 	info = "<h2>Information about the food in the Inventory</h2>\n"
-
+	info += "<p></p>".format(data=read)
 	return info
 
 # get data for humidity, expecting JSON input
 def hum_data(read):
 	print(read)
 	info = "<h2>Information about the humidity of the storage unit</h2>\n"
-
+	info += "<p>Current Humidity: {data}%</p>".format(data=read)
 	return info
 
 # get data for temp, expecting JSON input
 def temp_data(read):
 	print(read)
 	info = "<h2>Information about the temperature of the storage unit</h2>\n"
-
+	info += "<p>Current Temperature: {data_c}°C</p> \n <p>Current Temperature: {data_f}°F</p>".format(data_c=read["temp_c"], data_f=read["temp_f"])
 	return info
 
 # get freshness of food graph trend, expecting JSON input
 def fresh_data(read):
 	print(read)
 	info = "<h2>Information about the freshness of the food contained in the storage unit</h2>\n"
-	
+	info += "<p>Food freshness: {data}</p>".format(data=read)
 	return info
 
 # format recipe information, expecting dict input
@@ -145,3 +145,4 @@ def construct_dashboard(info):
 	dashboard.write("<p>ECE 5725 - Spring 2022 | IoT Food Management System</p>\n<p>Group 3, Wednesday Night Lab</p>\n")
 	dashboard.write("</footer>")
 	dashboard.close() # finished writing file
+
