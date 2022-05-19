@@ -37,8 +37,8 @@ done
 
 #The background processes will occur below (e.g., transmission of data to receiver device(s))
 
-host_addr = 192.168.1.1 #subject to change, run IP command to check and then edit this code
-host_port = 65432
+host_addr = "localhost" #subject to change, run IP command to check and then edit this code
+host_port = "65432"
 
 sudo python3 $script_full_path/transmit_server.py $host_addr $host_port &
 sudo python3 $script_full_path/transmit_client.py $host_addr $host_port &
