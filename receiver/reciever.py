@@ -55,19 +55,19 @@ for i in i_info:
   pg += "<p>{info_a}</p>\n".format(info_a=i)
 pg += "<h2> Temperature Graph over Time </h2>"
 plt.plot()
-plt.savefig()
+plt.savefig('temperature_c.png')
 plt.plot()
-plt.savefig()
-pg += "<p></p>"
-pg += "<p></p>"
+plt.savefig('temperature_f.png')
+pg += "<p><img src='temperature_c.png'></p>"
+pg += "<p><img src='temperature_f.png'></p>"
 pg += "<h2> Humidity Graph over Time </h2>"
 plt.plot()
-plt.savefig()
-pg += "<p></p>"
+plt.savefig('humidity.png')
+pg += "<p><img src='humidity.png'></p>"
 pg += "<h2> Freshness Graph over Time </h2>"
 plt.plot()
-plt.savefig()
-pg += "<p></p>"
+plt.savefig('freshness.png')
+pg += "<p><img src='freshness.png'></p>"
 for r in i_rep:
   pg += r
 pg += "</body>\n</html>\n"
