@@ -76,7 +76,7 @@ def websc_recipes(food):
 def inventory(read):
 	print(read)
 	info = "<h2>Information about the food in the Inventory</h2>\n"
-	info += "<p></p>".format(data=read)
+	info += "<p>{data}</p>".format(data=read)
 	return info
 
 # get data for humidity, expecting JSON input
