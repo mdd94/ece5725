@@ -168,20 +168,19 @@ def food_by_cam(img):
             red_image = PIL.Image.open(img)
             red_image_rgb = red_image.convert("RGB")
             rgb_pixel_value = red_image_rgb.getpixel((x,y))
-            food_name = "ObjectCamDect_{i}".format(i=objnum)
-            info_arr = [food_name, rgb_pixel_value]					    
+            info_arr = [found, rgb_pixel_value]					    
             result["info"].append(info_arr)
             cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
-            objnum += 1
     for obj in result["info"]:
         ## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
         item_color = obj[1]	
-		weaker = item_color[0]
+	weaker = item_color[0]
         stronger = item_color[1]
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
+	# get all pixels contained in the obj area, use number of black in area (not white) by pixel
+	# freshness = percent of black (black pixels of mask over total pixels in area).
         #result["freshness"].append()
-
     cv2.imshow('Image',img_rgb)
     cv2.imshow('Result',mask) 
     return result
