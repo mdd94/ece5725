@@ -22,6 +22,7 @@ data_dict = str.encode(data_string) # converts serialized data to bytes from str
 
 # also write json to file to access, keep appending data
 f = open("./reciever/json_data.txt", "a")
+data_dict += '\n'
 f.write(data_dict)
 f.close()
 
