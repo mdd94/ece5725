@@ -20,9 +20,12 @@ packet = data_to_send.captureData() # dictionary
 data_string = json.dumps(packet) #data serialized (dict -> str obj)
 data_dict = str.encode(data_string) # converts serialized data to bytes from str obj
 
-# also write json to file to access, keep appending data
-f = open("./reciever/data.json", "a")
+# also write json to file to access, keep appending data to data_all, replace for data
+f_all = open("./reciever/data_all.json", "a")
 data_dict += '\n'
+f_all.write(data_dict)
+f_all.close()
+f = open("./reciever/data.json", "w")
 f.write(data_dict)
 f.close()
 
