@@ -120,7 +120,7 @@ def recipe_book(read):
 # construct html dashboard with the info obtained via the previous helper functions
 # expect all info to be put into array to be written into HTML in function
 def construct_dashboard(info):
-	dashboard = open("dashboard_{d}.html".format(d=datetime.now()),"w")
+	dashboard = open("dashboard_{d}.html".format(d=info['timestamp_packet'],"w")
 	# format beginning
 	dashboard.write("<!DOCTYPE html> \n<html> \n<head> \n<title>Food Mgmt Dashboard</title> \n<style> \n.all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} \n.all-browsers > h1, \n.browser {margin: 10px;  padding: 5px;} \n.browser {background: white;} \n.browser > h2, p {  margin: 4px;  font-size: 90%;} \nfooter { text-align: center; padding: 3px; background-color: lightgray; color: white;}\n</style>\n</head> <body>\n")
 	dashboard.write("<h1>IoT Food Management System Dashboard</h1>\n")
