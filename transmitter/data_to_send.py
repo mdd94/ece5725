@@ -199,10 +199,10 @@ def food_by_cam(img):
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
     white = cv2.countNonZero(mask) #number of non black pixels
-        percentage = other/mask.size #white percentage 
+    percentage = other/mask.size #white percentage 
     # get all pixels contained in the obj area, use number of black in area (not white) by pixel
     # freshness = percent of black (black pixels of mask over total pixels in area).
-  	freshness = 1 - percentage #1 - percentage of white
+    freshness = 1 - percentage #1 - percentage of white
         #result["freshness"].append(freshness)
     cv2.imshow('Image',img_rgb)
     cv2.imshow('Result',mask) 
@@ -297,23 +297,23 @@ def piTFT_disp(data):
         temp_flag = (0, 255, 0) if not data["temp_flag"] else (255, 0, 0)
         hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
         if (temp_flag):
-        `	# red color
-        	print("Excess Temperature Detected - Red")
-        	GPIO.output(signal_light_pin[0], 255) # Red Pin Set
-        	GPIO.output(signal_light_pin[1], 25) # Green Pin Set
-        	GPIO.output(signal_light_pin[2], 0) # Blue Pin Set
+            # red color
+            print("Excess Temperature Detected - Red")
+            GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+            GPIO.output(signal_light_pin[1], 25) # Green Pin Set
+            GPIO.output(signal_light_pin[2], 0) # Blue Pin Set
         elif (hum_flag):
-        	# Purple color
-        	print("Excess Humidity Detected - Purple")
-        	GPIO.output(signal_light_pin[0], 255) # Red Pin Set
-        	GPIO.output(signal_light_pin[1], 0) # Green Pin Set
-        	GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
+            # Purple color
+            print("Excess Humidity Detected - Purple")
+            GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+            GPIO.output(signal_light_pin[1], 0) # Green Pin Set
+            GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
         else: # neither
-        	# white color
-        	print("Optimal Temperature and Humidity Detected - White")
-        	GPIO.output(signal_light_pin[0], 255) # Red Pin Set
-        	GPIO.output(signal_light_pin[1], 255) # Green Pin Set
-        	GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
+            # white color
+            print("Optimal Temperature and Humidity Detected - White")
+            GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+            GPIO.output(signal_light_pin[1], 255) # Green Pin Set
+            GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
         rightH_surface = text_font.render("Data",True,WHITE)
         rightH_rect = rightH_surface.get_rect(center = (275,50))
         rightN_surface = text_font.render(str(data["temp_c"]),True,temp_flag) # temp c
