@@ -26,10 +26,10 @@ data_dict = str.encode(data_string) # converts serialized data to bytes from str
 
 # also write json to file to access, keep appending data to data_all, replace for data
 f_all = open("/home/pi/ece5725/receiver/data_all.json", "a")
-f_all.write(data_dict)
+f_all.write(data_string)
 f_all.close()
 f = open("/home/pi/ece5725/receiver/data.json", "w")
-f.write(data_dict)
+f.write(data_string)
 f.close()
 
 #with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
