@@ -13,7 +13,7 @@ else:
     PORT = None
 
 if HOST is None:
-    HOST = "128.84.124.129"  # The server's hostname or IP address
+    HOST = "localhost"  # The server's hostname or IP address
 if PORT is None:
     PORT = 65432  # The port used by the server
 
