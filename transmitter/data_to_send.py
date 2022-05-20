@@ -117,7 +117,7 @@ def temp_and_hum_capture():
     dht11_device.exit()
     raise error
                                          
-def food_by_barcode(code):
+def food_by_barcode(code, temp, humidity):
     # https://thecleverprogrammer.com/2020/10/23/barcode-and-qr-code-reader-with-python/
     result = {"info":"", "freshness":0}
     #todo
@@ -127,7 +127,26 @@ def food_by_barcode(code):
     food_code_info = requests.get(url)
     if (food_code_info.status_code == 200):
     	result["info"] = food_code_info 
-    	freshness =  # look at upcfood api : exp date vs current day ratio: percentage per day left (100 days > implies 100% fresh)
+    	freshness = 0 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)
+	# we can also use basic facts about canned foods to set the freshness if it cannot be found; it takes about 2 years for the sell-by date to become unreliable on it's own if stored at 75 deg F and minimal humidity. temp and humidity affect this time. After this point, the person consuming or cooking the ingredient should be cautious. This is modeled based on predicted trends in bacteria growth dependent on these parameters.
+	if (freshness == 0 or freshness is None) and temp != -1 and humidity != -1:
+	    temp_ideal = (temp >= 40 and temp <= 60)
+	    hum_ideal = (humidity <= 15)
+	    if temp_ideal and humidity_ideal:
+		freshness = 100 # assume to be 100% fresh unless ambient conditions becom unideal
+	    elif temp_ideal and not humidity_ideal:
+		freshness = 100 * ((100-humidity)/100)
+	    elif not temp_ideal and humidity_ideal:
+		r = 2**48 # rate of bacterial grouth in a day
+		t = 10 # in units of days
+		rate_of_decay = 1 / (r**t)
+		freshness = 100 * (1-rate_of_decay)
+	    else:
+		r = 2**48 # rate of bacterial grouth in a day
+		t = 10 # in units of days
+		rate_of_decay_t = 1 - (1 / (r**t))
+		rate_of_decay_h = ((100-humidity)/100)
+		freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
     	result["freshness"] = freshness
     return result
                                          
@@ -191,20 +210,7 @@ def captureData():
     results["timestamp_packet"] = datetime.datetime.now()
     try:
         ## formatting the data into a JSON -> work with dictionary
-        ## Information for Recognized Food (name/type), ## Current Freshness of Food
-        # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606      
-        food_data = camera_scanner()
-        food_img = Image.open(food_data["camera"])
-        bar_codes = food_data["barcodes"]
-        if len(bar_codes) > 0:
-            b = food_by_barcode(bar_codes)
-            results["info"] = b["info"]
-            results["freshness"] = b["freshness"]
-        else:
-            i = food_by_cam(food_img)
-            results["info"] = i["info"]
-            results["freshness"] = i["freshness"]               
-        ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
+	## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
         temp_hum_dt = temp_and_hum_capture()
         results["temp_c"] = temp_hum_dt["temp_c"]
         results["temp_f"] = temp_hum_dt["temp_f"]
@@ -227,6 +233,19 @@ def captureData():
             results["temp_flag"] = False if threshold_rt <= 30 else True
             ## Humidity Threshold Flag - The transmitter is outputting the light signals for the environment if the humidity lies outside the optimal room humidity range (“Humidity Threshold Flag”).
             results["hum_flag"] = False if results["humidity"] >= 40 and results["humidity"] <= 60 else True 
+        ## Information for Recognized Food (name/type), ## Current Freshness of Food
+        # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606      
+        food_data = camera_scanner()
+        food_img = Image.open(food_data["camera"])
+        bar_codes = food_data["barcodes"]
+        if len(bar_codes) > 0:
+            b = food_by_barcode(bar_codes, results["temp_f"], results["humidity"])
+            results["info"] = b["info"]
+            results["freshness"] = b["freshness"]
+        else:
+            i = food_by_cam(food_img)
+            results["info"] = i["info"]
+            results["freshness"] = i["freshness"]               
         ## return data
         return results
     except:
