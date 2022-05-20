@@ -26,7 +26,6 @@ data_dict = str.encode(data_string) # converts serialized data to bytes from str
 
 # also write json to file to access, keep appending data to data_all, replace for data
 f_all = open("/home/pi/ece5725/receiver/data_all.json", "a")
-data_dict += '\n'
 f_all.write(data_dict)
 f_all.close()
 f = open("/home/pi/ece5725/receiver/data.json", "w")
