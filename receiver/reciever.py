@@ -52,7 +52,7 @@ for entries in data_all['data_string']:
     recipe = get_data.recipe_book(get_data.websc_recipes(entries['info'][0]))
     i_rep.append(recipe)
     timei.append(entries['timestamp_packet'])
-all_datapg = open("historical_data.html","w")
+all_datapg = open("./historical_data.html","w")
 pg = "<!DOCTYPE html> \n<html> \n<head> \n<title>Food Mgmt Dashboard</title> \n<style> \n.all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} \n.all-browsers > h1, \n.browser {margin: 10px;  padding: 5px;} \n.browser {background: white;} \n.browser > h2, p {  margin: 4px;  font-size: 90%;} \nfooter { text-align: center; padding: 3px; background-color: lightgray; color: white;}\n</style>\n</head> <body>\n"
 pg += "<p>Welcome to the IoT Food Management System! Data is graphed below.</p>\n"
 pg += "<h2> Food Inventory Log </h2>\n"
@@ -92,7 +92,7 @@ all_datapg.close()
 
 
 # create index file with all data linked
-index = open("index.html","w")
+index = open("./index.html","w")
 page = "<!DOCTYPE html> \n<html> \n<head> \n<title>Food Mgmt Dashboard</title> \n<style> \n.all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} \n.all-browsers > h1, \n.browser {margin: 10px;  padding: 5px;} \n.browser {background: white;} \n.browser > h2, p {  margin: 4px;  font-size: 90%;} \nfooter { text-align: center; padding: 3px; background-color: lightgray; color: white;}\n</style>\n</head> <body>\n"
 page += "<p>Welcome to the IoT Food Management System! Past dashboard data entries for specific dates are linked below.</p>\n"
 page += "<h2> Dashboard Entries</h2>\n"
