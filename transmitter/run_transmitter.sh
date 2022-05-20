@@ -15,5 +15,5 @@ sudo python3 $script_full_path/transmit_client.py $host_addr $host_port &
 
 #The foreground processes will occur below (e.g., displaying data in RT on the PiTFT screen)
 
-sudo python3 $script_full_path/main.py
+#sudo python3 $script_full_path/main.py
 
