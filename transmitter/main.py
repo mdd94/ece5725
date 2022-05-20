@@ -11,11 +11,6 @@ import sys
 import RPi.GPIO as GPIO
 
 # quit btn - consistent with data_to_send.py
-GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-def gpio17_cb(channel):
-    GPIO.cleanup()
-    quit()
-GPIO.add_event_detect(17, GPIO.FALLING, callback=gpio17_cb, bouncetime=400)
 
 # main loop
 while True:
