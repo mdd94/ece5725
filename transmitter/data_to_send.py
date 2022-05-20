@@ -138,20 +138,20 @@ def food_by_barcode(code, temp, humidity):
         temp_ideal = (temp >= 40 and temp <= 60)
         hum_ideal = (humidity <= 15)
         if temp_ideal and humidity_ideal:
-        freshness = 100 # assume to be 100% fresh unless ambient conditions becom unideal
+            freshness = 100 # assume to be 100% fresh unless ambient conditions becom unideal
         elif temp_ideal and not humidity_ideal:
-        freshness = 100 * ((100-humidity)/100)
+            freshness = 100 * ((100-humidity)/100)
         elif not temp_ideal and humidity_ideal:
-        r = 2**48 # rate of bacterial grouth in a day
-        t = days_left # in units of days
-        rate_of_decay = 1 / (r**t)
-        freshness = 100 * (rate_of_decay)
+            r = 2**48 # rate of bacterial grouth in a day
+            t = days_left # in units of days
+            rate_of_decay = 1 / (r**t)
+            freshness = 100 * (rate_of_decay)
         else:
-        r = 2**48 # rate of bacterial grouth in a day
-        t = days_left # in units of days
-        rate_of_decay_t = (1 / (r**t))
-        rate_of_decay_h = ((100-humidity)/100)
-        freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
+            r = 2**48 # rate of bacterial grouth in a day
+            t = days_left # in units of days
+            rate_of_decay_t = (1 / (r**t))
+            rate_of_decay_h = ((100-humidity)/100)
+            freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
     result["freshness"] = freshness
     return result
 
