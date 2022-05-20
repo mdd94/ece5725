@@ -126,13 +126,13 @@ def food_by_barcode(code, temp, humidity):
     url = "https://api.nal.usda.gov/fdc/v1/food/{c}?api_key={d}".format(c=data, d=DEMO_KEY)
     food_code_info = requests.get(url)
     if (food_code_info.status_code == 200):
-    	result["info"] = food_code_info 
+        result["info"] = food_code_info 
     # the publicationDate field can be used, we can calculate a base "days left" using today's date minus publicationDate, then decay the number of days by looking at ambient conditions.
     today = date.today()
     days_since = datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if food_code_info.has_key("publicationDate") else 30 # assume that it just arrived to store in the past 30 days
     days_since = (today.strftime("%Y-%m-%d")-days_since).days
     days_left = 730 - days_since
-    	freshness = (days_left / 730) * 100 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)
+    freshness = (days_left / 730) * 100 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)
     # we can also use basic facts about canned foods to set the freshness if it cannot be found; it takes about 2 years for the sell-by date to become unreliable on it's own if stored at 75 deg F and minimal humidity. temp and humidity affect this time. After this point, the person consuming or cooking the ingredient should be cautious. This is modeled based on predicted trends in bacteria growth dependent on these parameters.
     if (freshness == 0 or freshness is None) and temp != -1 and humidity != -1:
         temp_ideal = (temp >= 40 and temp <= 60)
@@ -152,7 +152,7 @@ def food_by_barcode(code, temp, humidity):
         rate_of_decay_t = (1 / (r**t))
         rate_of_decay_h = ((100-humidity)/100)
         freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
-    	result["freshness"] = freshness
+    result["freshness"] = freshness
     return result
 
 def scale_lightness(rgb, scale_l):
