@@ -202,9 +202,13 @@ def food_by_cam(img):
         stronger = item_color[1]
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
+	white = cv2.countNonZero(mask) #number of non black pixels
+        percentage = other/mask.size #white percentage 
+        
 	# get all pixels contained in the obj area, use number of black in area (not white) by pixel
 	# freshness = percent of black (black pixels of mask over total pixels in area).
-        #result["freshness"].append()
+  	freshness = 1 - percentage #1 - percentage of white
+        #result["freshness"].append(freshness)
     cv2.imshow('Image',img_rgb)
     cv2.imshow('Result',mask) 
     return result
