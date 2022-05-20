@@ -5,7 +5,7 @@ import data_to_send
 import sys
 import socket
 
-if len(sys.argv) > 1:
+'''if len(sys.argv) > 1:
     HOST = sys.argv[1]  # Standard loopback interface address (localhost)
     PORT = sys.argv[2]  # Port to listen on (non-privileged ports are > 1023)
 else:
@@ -27,4 +27,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data = conn.recv(1024)
             if not data:
                 break
-            conn.sendall(data)
+            conn.sendall(data)'''

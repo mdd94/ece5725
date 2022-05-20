@@ -87,7 +87,7 @@ def camera_scanner():
     camera.start_preview()
     x = datetime.datetime.now()
     time.sleep(2)
-    file_name = '/home/pi/ece5725/cam_data/image_{date}.jpg'.format(date=x).replace(" ", "_")
+    file_name = "/home/pi/ece5725/cam_data/image_{d}.jpg".format(d=x).replace(" ", "_")
     camera.capture(file_name)
     camera.stop_preview()
     results["camera"] = file_name
@@ -122,14 +122,14 @@ def food_by_barcode(code, temp, humidity):
     result = {"info":"", "freshness":0}
     #todo
     data = code # look at upc api
-    DEMO_KEY = TfDLCvnjZoR2oyWIVIebJysr1TbYqi3PPDggY1Q8 # obtained from api.data.gov via email
+    DEMO_KEY = "TfDLCvnjZoR2oyWIVIebJysr1TbYqi3PPDggY1Q8" # obtained from api.data.gov via email
     url = "https://api.nal.usda.gov/fdc/v1/food/{c}?api_key={d}".format(c=data, d=DEMO_KEY)
     food_code_info = requests.get(url)
     if (food_code_info.status_code == 200):
         result["info"] = food_code_info 
     # the publicationDate field can be used, we can calculate a base "days left" using today's date minus publicationDate, then decay the number of days by looking at ambient conditions.
-    today = date.today()
-    days_since = datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if food_code_info.has_key("publicationDate") else 30 # assume that it just arrived to store in the past 30 days
+    today = datetime.date.today()
+    days_since = datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if "publicationDate" not in food_code_info else 30 # assume that it just arrived to store in the past 30 days
     days_since = (today.strftime("%Y-%m-%d")-days_since).days
     days_left = 730 - days_since
     freshness = (days_left / 730) * 100 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)

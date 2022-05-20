@@ -13,7 +13,7 @@ import RPi.GPIO as GPIO
 # quit btn - consistent with data_to_send.py
 
 # main loop
-for i in range(10):
+while True:
   current_data = data_to_send.captureData() # this data capture will be shown in Real Time on the PiTFT. Because of issues with blocking the system for transmission for too long, the data transmission with be done in a separate instance as a background processes. However, we expect that as the environment remains fairly constant, the system data at the receiver will be fairly consistent.
   # load the data unto the PiTFT
   data_to_send.piTFT_disp(current_data)
