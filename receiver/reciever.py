@@ -92,7 +92,7 @@ all_datapg.close()
 
 
 # create index file with all data linked
-index = open("./index.html","w")
+index = open("/home/pi/ece5725/index.html","w")
 page = "<!DOCTYPE html> \n<html> \n<head> \n<title>Food Mgmt Dashboard</title> \n<style> \n.all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} \n.all-browsers > h1, \n.browser {margin: 10px;  padding: 5px;} \n.browser {background: white;} \n.browser > h2, p {  margin: 4px;  font-size: 90%;} \nfooter { text-align: center; padding: 3px; background-color: lightgray; color: white;}\n</style>\n</head> <body>\n"
 page += "<p>Welcome to the IoT Food Management System! Past dashboard data entries for specific dates are linked below.</p>\n"
 page += "<h2> Dashboard Entries</h2>\n"
