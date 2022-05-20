@@ -164,37 +164,37 @@ def scale_lightness(rgb, scale_l):
 def food_by_cam(img):
     # https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
     # https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
-    # https://docs.python.org/3/library/colorsys.html	
+    # https://docs.python.org/3/library/colorsys.html
     global objnum
     result = {"info":[], "freshness":[]}
     #todo
     image = cv2.imread(img)
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)						    
+    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)    
     # detect fruit color in img - we know that the color(s) which contrast the setting of the box are the object, so detect fruit as an obj, get matching color threshold from food_dict, and then analyze.									 
     img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     fruit_data = cv2.CascadeClassifier('fruit_data.xml')
-    found = stop_data.detectMultiScale(img_gray, minSize=(10, 10))	
-    print("Objects Found:")						    			    
+    found = stop_data.detectMultiScale(img_gray, minSize=(10, 10))
+    print("Objects Found:")   
     amount_found = len(found)
-    print("# Found: " + str(amount_found))						    
+    print("# Found: " + str(amount_found))  
     if amount_found != 0:
       for (x, y, width, height) in found:
             #cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
             print("found food")
             print("Location: {x1}, {y1}".format(x1=x, y1=y))
-            print("Dimensions: {w} by {h}".format(w=width, h=height))					    
+            print("Dimensions: {w} by {h}".format(w=width, h=height))   
             # which food?
             red_image = PIL.Image.open(img)
             red_image_rgb = red_image.convert("RGB")
             rgb_pixel_value = red_image_rgb.getpixel((x,y))
-            info_arr = [found, rgb_pixel_value]					    
+            info_arr = [found, rgb_pixel_value]  
             result["info"].append(info_arr)
             cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
     for obj in result["info"]:
         ## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
-        item_color = obj[1]	
-    weaker = scale_lightness(item_color, 0.5)
+        item_color = obj[1]
+        weaker = scale_lightness(item_color, 0.5)
         stronger = scale_lightness(item_color, 1.5)
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
