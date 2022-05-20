@@ -7,7 +7,7 @@ import json
 import matplotlib.pyplot as plt
 
 # read single data entry in from the json
-f = open("data.json", "r")
+f = open("/home/pi/ece5725/receiver/data.json", "r")
 data = json.load(f)
 print(f.read())
 
@@ -31,7 +31,7 @@ info = [information, temperature, humidity, freshness, recipe]
 get_data.construct_dashboard(info) # check directory for output
 
 # create file with all data, historical html
-f_all = open("data_all.json", "r")
+f_all = open("/home/pi/ece5725/receiver/data_all.json", "r")
 data_all = json.load(f_all)
 print(f_all.read())
 i_info = []
@@ -52,7 +52,7 @@ for entries in data_all['data_string']:
     recipe = get_data.recipe_book(get_data.websc_recipes(entries['info'][0]))
     i_rep.append(recipe)
     timei.append(entries['timestamp_packet'])
-all_datapg = open("./historical_data.html","w")
+all_datapg = open("/home/pi/ece5725/historical_data.html","w")
 pg = "<!DOCTYPE html> \n<html> \n<head> \n<title>Food Mgmt Dashboard</title> \n<style> \n.all-browsers {margin: 0; padding: 5px; background-color: rgb(240, 250, 255);} \n.all-browsers > h1, \n.browser {margin: 10px;  padding: 5px;} \n.browser {background: white;} \n.browser > h2, p {  margin: 4px;  font-size: 90%;} \nfooter { text-align: center; padding: 3px; background-color: lightgray; color: white;}\n</style>\n</head> <body>\n"
 pg += "<p>Welcome to the IoT Food Management System! Data is graphed below.</p>\n"
 pg += "<h2> Food Inventory Log </h2>\n"
