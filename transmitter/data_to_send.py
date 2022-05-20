@@ -129,8 +129,8 @@ def food_by_barcode(code, temp, humidity):
         result["info"] = food_code_info 
     # the publicationDate field can be used, we can calculate a base "days left" using today's date minus publicationDate, then decay the number of days by looking at ambient conditions.
     today = datetime.date.today()
-    days_since = datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if "publicationDate" not in food_code_info else 30 # assume that it just arrived to store in the past 30 days
-    days_since = (today.strftime("%Y-%m-%d")-days_since).days
+    days_since = datetime.datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if "publicationDate" not in food_code_info else 30 # assume that it just arrived to store in the past 30 days
+    days_since = (today.strptime("%Y-%m-%d")-days_since).days
     days_left = 730 - days_since
     freshness = (days_left / 730) * 100 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)
     # we can also use basic facts about canned foods to set the freshness if it cannot be found; it takes about 2 years for the sell-by date to become unreliable on it's own if stored at 75 deg F and minimal humidity. temp and humidity affect this time. After this point, the person consuming or cooking the ingredient should be cautious. This is modeled based on predicted trends in bacteria growth dependent on these parameters.
