@@ -28,3 +28,6 @@ done
 #The foreground processes will occur below
 
 sudo python3 $script_full_path/receiver.py
+
+# Backup to GitHub
+/home/pi/ece5725/push_changes.sh &
