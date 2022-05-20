@@ -12,7 +12,7 @@ HOST = sys.argv[1]  # Standard loopback interface address (localhost)
 PORT = sys.argv[2]  # Port to listen on (non-privileged ports are > 1023)
 
 if HOST is None:
-    HOST = "127.0.0.1"  # The server's hostname or IP address
+    HOST = "128.84.124.129"  # The server's hostname or IP address
 if PORT is None:
     PORT = 65432  # The port used by the server
 
