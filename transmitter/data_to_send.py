@@ -127,31 +127,31 @@ def food_by_barcode(code, temp, humidity):
     food_code_info = requests.get(url)
     if (food_code_info.status_code == 200):
     	result["info"] = food_code_info 
-	# the publicationDate field can be used, we can calculate a base "days left" using today's date minus publicationDate, then decay the number of days by looking at ambient conditions.
-	today = date.today()
-	days_since = datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if food_code_info.has_key("publicationDate") else 30 # assume that it just arrived to store in the past 30 days
-	days_since = (today.strftime("%Y-%m-%d")-days_since).days
-	days_left = 730 - days_since
+    # the publicationDate field can be used, we can calculate a base "days left" using today's date minus publicationDate, then decay the number of days by looking at ambient conditions.
+    today = date.today()
+    days_since = datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if food_code_info.has_key("publicationDate") else 30 # assume that it just arrived to store in the past 30 days
+    days_since = (today.strftime("%Y-%m-%d")-days_since).days
+    days_left = 730 - days_since
     	freshness = (days_left / 730) * 100 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)
-	# we can also use basic facts about canned foods to set the freshness if it cannot be found; it takes about 2 years for the sell-by date to become unreliable on it's own if stored at 75 deg F and minimal humidity. temp and humidity affect this time. After this point, the person consuming or cooking the ingredient should be cautious. This is modeled based on predicted trends in bacteria growth dependent on these parameters.
-	if (freshness == 0 or freshness is None) and temp != -1 and humidity != -1:
-	    temp_ideal = (temp >= 40 and temp <= 60)
-	    hum_ideal = (humidity <= 15)
-	    if temp_ideal and humidity_ideal:
-		freshness = 100 # assume to be 100% fresh unless ambient conditions becom unideal
-	    elif temp_ideal and not humidity_ideal:
-		freshness = 100 * ((100-humidity)/100)
-	    elif not temp_ideal and humidity_ideal:
-		r = 2**48 # rate of bacterial grouth in a day
-		t = days_left # in units of days
-		rate_of_decay = 1 / (r**t)
-		freshness = 100 * (rate_of_decay)
-	    else:
-		r = 2**48 # rate of bacterial grouth in a day
-		t = days_left # in units of days
-		rate_of_decay_t = (1 / (r**t))
-		rate_of_decay_h = ((100-humidity)/100)
-		freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
+    # we can also use basic facts about canned foods to set the freshness if it cannot be found; it takes about 2 years for the sell-by date to become unreliable on it's own if stored at 75 deg F and minimal humidity. temp and humidity affect this time. After this point, the person consuming or cooking the ingredient should be cautious. This is modeled based on predicted trends in bacteria growth dependent on these parameters.
+    if (freshness == 0 or freshness is None) and temp != -1 and humidity != -1:
+        temp_ideal = (temp >= 40 and temp <= 60)
+        hum_ideal = (humidity <= 15)
+        if temp_ideal and humidity_ideal:
+        freshness = 100 # assume to be 100% fresh unless ambient conditions becom unideal
+        elif temp_ideal and not humidity_ideal:
+        freshness = 100 * ((100-humidity)/100)
+        elif not temp_ideal and humidity_ideal:
+        r = 2**48 # rate of bacterial grouth in a day
+        t = days_left # in units of days
+        rate_of_decay = 1 / (r**t)
+        freshness = 100 * (rate_of_decay)
+        else:
+        r = 2**48 # rate of bacterial grouth in a day
+        t = days_left # in units of days
+        rate_of_decay_t = (1 / (r**t))
+        rate_of_decay_h = ((100-humidity)/100)
+        freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
     	result["freshness"] = freshness
     return result
 
@@ -194,14 +194,14 @@ def food_by_cam(img):
     for obj in result["info"]:
         ## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
         item_color = obj[1]	
-	weaker = scale_lightness(item_color, 0.5)
+    weaker = scale_lightness(item_color, 0.5)
         stronger = scale_lightness(item_color, 1.5)
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
-	white = cv2.countNonZero(mask) #number of non black pixels
+    white = cv2.countNonZero(mask) #number of non black pixels
         percentage = other/mask.size #white percentage 
-	# get all pixels contained in the obj area, use number of black in area (not white) by pixel
-	# freshness = percent of black (black pixels of mask over total pixels in area).
+    # get all pixels contained in the obj area, use number of black in area (not white) by pixel
+    # freshness = percent of black (black pixels of mask over total pixels in area).
   	freshness = 1 - percentage #1 - percentage of white
         #result["freshness"].append(freshness)
     cv2.imshow('Image',img_rgb)
@@ -214,7 +214,7 @@ def captureData():
     results["timestamp_packet"] = datetime.datetime.now()
     try:
         ## formatting the data into a JSON -> work with dictionary
-	## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
+    ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
         temp_hum_dt = temp_and_hum_capture()
         results["temp_c"] = temp_hum_dt["temp_c"]
         results["temp_f"] = temp_hum_dt["temp_f"]
@@ -331,3 +331,4 @@ def piTFT_disp(data):
         screen.blit(leftO_surface, leftO_rect)
         screen.blit(rightO_surface, rightO_rect)
         pygame.display.flip()
+
