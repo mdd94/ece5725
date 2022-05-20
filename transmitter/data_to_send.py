@@ -154,22 +154,18 @@ def food_by_barcode(code, temp, humidity):
 		freshness = 100 * (rate_of_decay_h*rate_of_decay_t)
     	result["freshness"] = freshness
     return result
+
+def scale_lightness(rgb, scale_l):
+    # convert rgb to hls
+    h, l, s = colorsys.rgb_to_hls(*rgb)
+    # manipulate h, l, s values and return as rgb
+    return colorsys.hls_to_rgb(h, min(1, l * scale_l), s = s)
                                          
 def food_by_cam(img):
     # https://www.hackster.io/taifur/ripe-fruit-identification-9c8848
     # https://medium.com/@jamesthesken/detect-ripe-fruit-in-5-minutes-with-opencv-a1dc6926556c
-    # https://docs.python.org/3/library/colorsys.html		
-    # define color thresholds tones in HSV
+    # https://docs.python.org/3/library/colorsys.html	
     global objnum
-    food_dict = {"Red":[(345, 89.1, 50.6), (12, 69.5, 86.3)],
-            "Deep_Orange":[(19, 93.1, 79.6), (20, 71.0, 100.0)],
-            "Orange":[(33, 98.6, 81.2), (35, 75.3, 100.0)],
-            "Ripe_Mango":[(44, 97.3, 88.2), (50, 74.1, 100.0)],
-            "Bright_Yellow":[(56, 100.0, 88.2), (60, 88.2, 100.0)],
-            "Green_Apple":[(103, 72.7, 58.8), (103, 51.9, 82.4)],
-            "Kiwi":[(91, 83.4, 78.0), (102, 63.5, 100.0)],
-            "Blueberry":[(240, 100.0, 50.2), (240, 20.0, 100.0)],
-            "Blue_Violet":[(282, 100.0, 28.6), (300, 45.4, 93.3)]}
     result = {"info":[], "freshness":[]}
     #todo
     image = cv2.imread(img)
@@ -198,8 +194,8 @@ def food_by_cam(img):
     for obj in result["info"]:
         ## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
         item_color = obj[1]	
-	weaker = item_color[0]
-        stronger = item_color[1]
+	weaker = scale_lightness(item_color, 0.5)
+        stronger = scale_lightness(item_color, 1.5)
         mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
 	white = cv2.countNonZero(mask) #number of non black pixels
