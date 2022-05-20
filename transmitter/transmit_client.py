@@ -11,6 +11,9 @@ import sys
 if len(sys.argv) > 1:
     HOST = sys.argv[1]  # Standard loopback interface address (localhost)
     PORT = sys.argv[2]  # Port to listen on (non-privileged ports are > 1023)
+else:
+    HOST = None
+    PORT = None
 
 if HOST is None:
     HOST = "128.84.124.129"  # The server's hostname or IP address
