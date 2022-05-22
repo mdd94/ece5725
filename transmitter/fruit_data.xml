@@ -1,5 +1,5 @@
-<!-- src: https://github.com/knadh/xmlutils.py/blob/master/samples/fruits.xml -->
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?> <!-- src: https://github.com/knadh/xmlutils.py/blob/master/samples/fruits.xml -->
+
 <fruits>
 	<item>
 		<id>1000</id>

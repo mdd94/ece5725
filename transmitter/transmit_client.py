@@ -25,12 +25,17 @@ data_string = json.dumps(packet) #data serialized (dict -> str obj)
 data_dict = str.encode(data_string) # converts serialized data to bytes from str obj
 
 # also write json to file to access, keep appending data to data_all, replace for data
-f_all = open("/home/pi/ece5725/receiver/data_all.json", "a")
-f_all.write(data_string)
-f_all.close()
-f = open("/home/pi/ece5725/receiver/data.json", "w")
-f.write(data_string)
-f.close()
+try:
+    f_all = open("/home/pi/ece5725/receiver/data_all.json", "a")
+    f_all.write(data_string)
+    f_all.close()
+    f = open("/home/pi/ece5725/receiver/data.json", "w")
+    f.write(data_string)
+    f.close()
+except:
+    print("not saved, error occured")
+    print("Error: "+sys.exc_info())
+    sys.exit(2)
 
 #with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 #    s.connect((HOST, PORT))

@@ -26,6 +26,7 @@ import board
 from ws_barcode_scanner import BarcodeScanner
 objnum = 1
 import requests
+from pathlib import Path
 
 ## Set up GPIO pins and devices
 calibration_light_pin = 26
@@ -41,17 +42,8 @@ GPIO.setup(signal_light_pin[0], GPIO.OUT)
 GPIO.setup(signal_light_pin[1], GPIO.OUT)
 GPIO.setup(signal_light_pin[2], GPIO.OUT)
 dht11_device = adafruit_dht.DHT11(board.D13, use_pulseio=False)
-camera = PiCamera()
 # barcodes
-scanner = BarcodeScanner("/dev/tty5")
-
-GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-def gpio17_cb(channel):
-    GPIO.cleanup()
-    quit()
-    
-GPIO.add_event_detect(17, GPIO.FALLING, callback=gpio17_cb, bouncetime=400)
+scanner = BarcodeScanner("/dev/serial0")
 
 # PiTFT
 os.putenv('SDL_VIDEODRIVER','fbcon')
@@ -73,28 +65,39 @@ def calibration_light():
     ## The transmitter is outputting a calibration light signal to indicate that data is being transmitted to the receiver.
     now = time.time()
     global p
-    while (time.time() < now + 1):
+    while (time.time() < now + 2):
         p.start(100)
-        print("blinky")
         p.stop()
-        print("no blinky")
+        print("blink")
+        
+def capture_photo():
+    # take the photo and add to directory to be read
+    camera = PiCamera()
+    x = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    calibration_light()
+    file_name = r'cam_data/image_{d}.jpg'.format(d=x)
+    camera.capture(file_name)
+    camera.close()
+    return file_name
   
 def camera_scanner():
     ## return values/data
     results = dict()
-    # camera capture
-    global camera
-    camera.start_preview()
-    x = datetime.datetime.now()
-    time.sleep(2)
-    file_name = "/home/pi/ece5725/cam_data/image_{d}.jpg".format(d=x).replace(" ", "_")
-    camera.capture(file_name)
-    camera.stop_preview()
+    time.sleep(0.2)
+    # camera capture - get the last photo in photo directory
+    file = open("file_log.txt", "r")
+    file_name = file.readlines()[-1] # the only line should be the path of the most recent photo taken
+    print(file_name)
+    print(type(file_name))
     results["camera"] = file_name
     # barcode scanner
     global scanner
     timestamp = scanner.last_timestamp
+    print("Looking for code")
     bcode = scanner.last_code
+    #if (bcode == b''):
+        #bcode = 1104086
+    print(bcode)
     results["barcodes"] = [timestamp, bcode]
     return results
   
@@ -120,18 +123,34 @@ def temp_and_hum_capture():
 def food_by_barcode(code, temp, humidity):
     # https://thecleverprogrammer.com/2020/10/23/barcode-and-qr-code-reader-with-python/
     result = {"info":"", "freshness":0}
+    if (code is None or code == b''):
+        print("barcode cannot be read due to empty code")
+        result["info"] = -1
+        result["freshness"] = -1
+        return result
     #todo
     data = code # look at upc api
     DEMO_KEY = "TfDLCvnjZoR2oyWIVIebJysr1TbYqi3PPDggY1Q8" # obtained from api.data.gov via email
     url = "https://api.nal.usda.gov/fdc/v1/food/{c}?api_key={d}".format(c=data, d=DEMO_KEY)
     food_code_info = requests.get(url)
-    if (food_code_info.status_code == 200):
-        result["info"] = food_code_info 
+    print("Status Code: "+str(food_code_info.status_code))
+    if (food_code_info.status_code == 200 or food_code_info.status_code == 201):
+        print("GET request worked")
+        text = food_code_info.text
+        result["info"] = text
+    else:
+        print("barcode cannot be read due to GET request issue (error or timeout): " + str(food_code_info.status_code))
+        result["info"] = -1
+        result["freshness"] = -1
+        return result
     # the publicationDate field can be used, we can calculate a base "days left" using today's date minus publicationDate, then decay the number of days by looking at ambient conditions.
-    today = datetime.date.today()
-    days_since = datetime.datetime.strptime(food_code_info["publicationDate"], "%Y-%m-%d") if "publicationDate" not in food_code_info else 30 # assume that it just arrived to store in the past 30 days
-    days_since = (today.strptime("%Y-%m-%d")-days_since).days
-    days_left = 730 - days_since
+    today = datetime.datetime.now()
+    pub_start = text.find("publicationDate")
+    pub_date = text[pub_start + 18: pub_start + 28] 
+    days_since = datetime.datetime.strptime(pub_date, "%m/%d/%Y") if pub_start != -1 else datetime.datetime.now() - datetime.timedelta(30) # assume that it just arrived to store in the past 30 days
+    days_since_then = today - days_since
+    print("days type = ", type(days_since_then.days))
+    days_left = 730 - int(days_since_then.days)
     freshness = (days_left / 730) * 100 # look at upcfood api : exp date vs current day ratio: percentage per day left (730 days > implies 100% fresh)
     # we can also use basic facts about canned foods to set the freshness if it cannot be found; it takes about 2 years for the sell-by date to become unreliable on it's own if stored at 75 deg F and minimal humidity. temp and humidity affect this time. After this point, the person consuming or cooking the ingredient should be cautious. This is modeled based on predicted trends in bacteria growth dependent on these parameters.
     if (freshness == 0 or freshness is None) and temp != -1 and humidity != -1:
@@ -171,47 +190,77 @@ def food_by_cam(img):
     image = cv2.imread(img)
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)    
-    # detect fruit color in img - we know that the color(s) which contrast the setting of the box are the object, so detect fruit as an obj, get matching color threshold from food_dict, and then analyze.									 
-    img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    fruit_data = cv2.CascadeClassifier('fruit_data.xml')
-    found = stop_data.detectMultiScale(img_gray, minSize=(10, 10))
+    f = 'apple.xml'
+    fruit_data = cv2.CascadeClassifier(f)
+    found = fruit_data.detectMultiScale(img_gray, minSize=(10, 10))
     print("Objects Found:")   
     amount_found = len(found)
     print("# Found: " + str(amount_found))  
-    if amount_found != 0:
+    if amount_found > 0:
       for (x, y, width, height) in found:
-            #cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
-            print("found food")
-            print("Location: {x1}, {y1}".format(x1=x, y1=y))
-            print("Dimensions: {w} by {h}".format(w=width, h=height))   
-            # which food?
-            red_image = PIL.Image.open(img)
-            red_image_rgb = red_image.convert("RGB")
-            rgb_pixel_value = red_image_rgb.getpixel((x,y))
-            info_arr = [found, rgb_pixel_value]  
-            result["info"].append(info_arr)
-            cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
-    for obj in result["info"]:
+        #cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
+        print("found food")
+        print("Location: {x1}, {y1}".format(x1=x, y1=y))
+        print("Dimensions: {w} by {h}".format(w=width, h=height))   
+        # restrict area of analysis to the apple
+        apple = image[y:y+width, x:x+height]
+        print(image.shape, apple.shape)
+        c = r'cropped.jpg'
+        cv2.imwrite(c, apple)
+        read_image = Image.open(img)
+        left = x.item()
+        top = y.item()
+        right = x.item()+height.item()
+        bottom = y.item()+width.item()
+        print("left: " , left)
+        print("top: " , top)
+        print("right: " , right)
+        print("bottom: ", bottom)
+        read_image = read_image.crop((left, top, right, bottom))
+        read_image_rgb = read_image.convert("RGB")
+        cw, ch = read_image_rgb.size
+        center = (int((cw)/2),int((ch)/2))
+        print("center:", center)
+        rgb_pixel_value = read_image_rgb.getpixel(center)
+        info_arr = [cv2.imread(c), rgb_pixel_value]  
+        result["info"].append(info_arr)
+        cv2.rectangle(img_rgb, (x, y), (x + height, y + width), (0, 255, 0), 5)
+        print("info: "+str(result["info"]))
+    else: # no items found, so nothing to analyze
+        print("Since no objects were found, there is no information or freshness to analyze by view. Please add items to perform this analysis. Perhaps you might want to scan the barcodes of any canned items within?")
+        result["info"] = -1
+        result["freshness"] = -1
+        return result
+    item_arr = result["info"]
+    result["info"] = f.split(".", 1)[0] #name of obj
+    for obj in item_arr:
         ## Based on infolist, threshold colors via food_dict => https://medium.com/codex/rgb-to-color-names-in-python-the-robust-way-ec4a9d97a01f
         item_color = obj[1]
-        weaker = scale_lightness(item_color, 0.5)
-        stronger = scale_lightness(item_color, 1.5)
-        mask = cv2.inRange(img_hsv, weaker, stronger) #Threshold HSV image to obtain input color
+        #weaker = scale_lightness(item_color, 0.5)
+        #stronger = scale_lightness(item_color, 1.5)
+        weaker = np.array([0,0,0])#scale_lightness(item_color, 0.5)
+        stronger = np.array([350,55,100])#scale_lightness(item_color, 1.5)
+        # detect fruit color in img - we know that the color(s) which contrast the setting of the box are the object, so detect fruit as an obj, get matching color threshold from food_dict, and then analyze.
+        print(type(obj[0]))
+        mask = cv2.inRange(obj[0], weaker, stronger) #Threshold HSV image to obtain input color
         #calculate % of white content 
         white = cv2.countNonZero(mask) #number of non black pixels
-        percentage = other/mask.size #white percentage 
+        percentage = white/mask.size #white percentage 
+        print("white = "+str(white))
+        print("percentage white = "+str(percentage*100)+"%")
         # get all pixels contained in the obj area, use number of black in area (not white) by pixel
         # freshness = percent of black (black pixels of mask over total pixels in area).
         freshness = 1 - percentage #1 - percentage of white
-        result["freshness"].append(freshness)
-    cv2.imshow('Image',img_rgb)
-    cv2.imshow('Result',mask) 
+        result["freshness"] = freshness*100
+        print("freshness: "+str(result["freshness"]))
+    #cv2.imshow('Image',img_rgb)
+    #cv2.imshow('Result',mask)
     return result
   
 def captureData():
     ## this function will be imported into the code that transmits the data, calls the functions defined above
     results = dict()
-    results["timestamp_packet"] = datetime.datetime.now()
+    results["timestamp_packet"] = str(datetime.datetime.now())
     try:
         ## formatting the data into a JSON -> work with dictionary
         ## Ambient Temperature of Demo Environment & Ambient Humidity of Demo Environment
@@ -240,23 +289,38 @@ def captureData():
         ## Information for Recognized Food (name/type), ## Current Freshness of Food
         # for image scanner: using color analysis, we can compare the expected color of a dected object to the actual colors analyzed in the image in order to determine if an overwhelming part of the apperance indicates expiration. src: https://towardsdatascience.com/object-detection-with-10-lines-of-code-d6cb4d86f606      
         food_data = camera_scanner()
-        food_img = Image.open(food_data["camera"])
+        print(food_data["barcodes"])
+        path_file = food_data["camera"].strip()
+        print(path_file)
+        print(type(path_file))
+        print(os.path.exists(path_file))
+        print(os.listdir())
+        if not os.path.exists(path_file):
+            print("Path to photo cannot be found.")
+            sys.exit(2)
+        #food_img = Image.open(path_file, mode='r')
         bar_codes = food_data["barcodes"]
-        if len(bar_codes) > 0:
-            b = food_by_barcode(bar_codes, results["temp_f"], results["humidity"])
+        print(bar_codes)
+        if len(bar_codes) > 1 and bar_codes[1] != b'':
+            b = food_by_barcode(bar_codes[1], results["temp_f"], results["humidity"])
             results["info"] = b["info"]
             results["freshness"] = b["freshness"]
         else:
-            i = food_by_cam(food_img)
+            i = food_by_cam(path_file)
             results["info"] = i["info"]
             results["freshness"] = i["freshness"]               
         ## return data
+        print(str(results))
         return results
     except:
-        print("Unexpected error:", sys.exc_info())
-        return {"info":-1, "freshness":-1, "temp_c":-1, "temp_f":-1, "humidity":-1, "temp_flag":-1, "hum_flag":-1} # params should equal -1 to indicate no valid reading
+        print("Quitting Program. Unexpected error: ", sys.exc_info())
+        GPIO.cleanup()
+        cv2.destroyAllWindows()
+        sys.exit(2)
+        quit()
   
 def piTFT_disp(data):
+    print(str(data))
     ## pygame
     global signal_light_pin
     global screen
@@ -267,6 +331,7 @@ def piTFT_disp(data):
     global button_position
     global header_font
     global text_font
+    global GPIO
     #quit button
     quit_surface = text_font.render(button_text,True,WHITE)
     quit_rect = quit_surface.get_rect(center = (button_position[0],button_position[1]))
@@ -284,6 +349,7 @@ def piTFT_disp(data):
                 if (x >= button_position[0] - 10 and x <= button_position[0] + 10):
                     # pushed close btn
                     GPIO.cleanup()
+                    cv2.destroyAllWindows()
                     quit()
     # draw data to screen
     leftH_surface = text_font.render("Fields",True,WHITE)
@@ -296,24 +362,18 @@ def piTFT_disp(data):
     leftO_rect = leftO_surface.get_rect(center= (50, 200))
     temp_flag = (0, 255, 0) if not data["temp_flag"] else (255, 0, 0)
     hum_flag = (0, 255, 0) if not data["hum_flag"] else (255, 0, 0)
-    if (data["temp_flag"]):
+    if (data["temp_flag"] or data["hum_flag"]):
         # red color
-        #print("Excess Temperature Detected - Red")
-        GPIO.output(signal_light_pin[0], 255) # Red Pin Set
-        GPIO.output(signal_light_pin[1], 25) # Green Pin Set
-        GPIO.output(signal_light_pin[2], 0) # Blue Pin Set
-    elif (data["hum_flag"]):
-        # Purple color
-        #print("Excess Humidity Detected - Purple")
+        print("Excess Temperature or Humidity Detected")
         GPIO.output(signal_light_pin[0], 255) # Red Pin Set
         GPIO.output(signal_light_pin[1], 0) # Green Pin Set
         GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
     else: # neither
         # white color
-        #print("Optimal Temperature and Humidity Detected - White")
-        GPIO.output(signal_light_pin[0], 255) # Red Pin Set
+        print("Optimal Temperature and Humidity Detected")
+        GPIO.output(signal_light_pin[0], 0) # Red Pin Set
         GPIO.output(signal_light_pin[1], 255) # Green Pin Set
-        GPIO.output(signal_light_pin[2], 255) # Blue Pin Set
+        GPIO.output(signal_light_pin[2], 0) # Blue Pin Set
     rightH_surface = text_font.render("Data",True,WHITE)
     rightH_rect = rightH_surface.get_rect(center = (275,50))
     print(data["temp_c"])
